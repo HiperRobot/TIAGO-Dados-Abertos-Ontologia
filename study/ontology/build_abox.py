@@ -34,6 +34,7 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACTS = ROOT / "contracts" / "ons"
 OUT_TTL = ROOT / "study" / "ontology" / "abox.ttl"
+OUT_JSON = ROOT / "study" / "ontology" / "abox.json"
 OUT_LEDGER = ROOT / "study" / "fidelity" / "ledger.json"
 
 ONS = "https://w3id.org/tiago-ons/onto#"
@@ -88,6 +89,23 @@ class Graph:
 
     def triples(self) -> int:
         return sum(len(v) for v in self.nodes.values())
+
+    def as_json(self) -> dict:
+        """Same graph as plain JSON, for consumers without an RDF library:
+        {subject: [[predicate, kind, value, lang], ...]}, kind in {"lit", "ref"}."""
+        literal = re.compile(r'^("(?:[^"\\]|\\.)*")(?:@([a-z-]+)|\^\^xsd:\w+)?$', re.S)
+        out = {}
+        for s, pos in self.nodes.items():
+            rows = []
+            for p, o in pos:
+                m = literal.match(o)
+                if m:
+                    # the escapes written by lit() are all valid JSON string escapes
+                    rows.append([p, "lit", json.loads(m.group(1)), m.group(2) or ""])
+                else:
+                    rows.append([p, "ref", o.strip("<>"), ""])
+            out[s.strip("<>")] = rows
+        return out
 
     def dump(self) -> str:
         out = [PREFIXES]
@@ -223,7 +241,7 @@ def migrate(doc: dict, g: Graph, L: Ledger) -> None:
         g.add(ds, "ons:agentInstruction", lit(cp["agentInstructions"], "pt"))
         rec("agentInstructions", "literal", "own")
     if cp.get("granularity"):
-        g.add(ds, "ons:temporalResolution", lit(norm(cp["granularity"])))
+        g.add(ds, "dct:accrualPeriodicity", lit(cp["granularity"]))
         rec("granularity", "literal", "standard")
     if cp.get("sourceExpression"):
         g.add(ds, "ons:sourceExpression", lit(cp["sourceExpression"]))
@@ -330,7 +348,7 @@ def migrate(doc: dict, g: Graph, L: Ledger) -> None:
         else:
             rec("row_grain.spatial", "dropped")
     if rg.get("temporal"):
-        g.add(ds, "ons:temporalResolution", lit(norm(rg["temporal"])))
+        g.add(ds, "ons:temporalResolution", lit(rg["temporal"]))
         rec("row_grain.temporal", "literal", "standard")
     if rg.get("temporal_column"):
         tc = col_iri.get(rg["temporal_column"])
@@ -421,8 +439,11 @@ def migrate(doc: dict, g: Graph, L: Ledger) -> None:
             g.add(ds, "ons:primaryUseCase", concept(g, "usecase", "ons:UseCase", v))
             rec("query_routing", "semantic", "own")
         elif k.startswith("supports_"):
-            if v:
-                g.add(ds, "ons:supportsUseCase", concept(g, "usecase", "ons:UseCase", k[len("supports_"):]))
+            uc = concept(g, "usecase", "ons:UseCase", k[len("supports_"):])
+            if v is True:
+                g.add(ds, "ons:supportsUseCase", uc)
+            elif v is False:
+                g.add(ds, "ons:doesNotSupportUseCase", uc)
             rec("query_routing", "semantic", "own")
         else:
             rec("query_routing", "dropped")
@@ -490,6 +511,7 @@ def main() -> int:
     for f in files:
         migrate(yaml.safe_load(f.read_text(encoding="utf-8")), g, L)
     OUT_TTL.write_text(g.dump(), encoding="utf-8")
+    OUT_JSON.write_text(json.dumps(g.as_json(), ensure_ascii=False), encoding="utf-8")
     try:
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True,
                                 text=True, check=True).stdout.strip()

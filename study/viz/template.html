@@ -1,0 +1,179 @@
+<title>Ontologia TIAGO-ONS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; a wide class map, then contract-vs-ontology bars, then a per-dataset explorer. */
+:root{
+  --bg:#f7f8f6; --surface:#ffffff; --ink:#14201c; --ink-2:#4a5a54; --ink-3:#7b8a84; --line:#dde3df;
+  --sem:#2a78d6; --lit:#eb6834; --drop:#a9b3ae; --own:#0e7c66; --std:#6250d6; --focus:#2a78d6;
+  --display:"Space Grotesk",system-ui,sans-serif; --body:Inter,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#121715; --surface:#1a211e; --ink:#eef2ef; --ink-2:#b9c5bf; --ink-3:#8a9891; --line:#2c3632;
+  --sem:#3987e5; --lit:#d95926; --drop:#5d6964; --own:#2fb597; --std:#9085e9; --focus:#3987e5; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#121715; --surface:#1a211e; --ink:#eef2ef; --ink-2:#b9c5bf; --ink-3:#8a9891; --line:#2c3632;
+  --sem:#3987e5; --lit:#d95926; --drop:#5d6964; --own:#2fb597; --std:#9085e9; --focus:#3987e5; color-scheme:dark }
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1040px;margin:0 auto;padding-block:28px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:36px}
+h1{font-family:var(--display);font-size:30px;line-height:1.15;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-size:20px;margin:0 0 4px;text-wrap:balance}
+p{margin:0;max-width:68ch;color:var(--ink-2)}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:6px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px}
+.stat b{display:block;font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
+.stat span{font-size:12.5px;color:var(--ink-2)}
+section{display:flex;flex-direction:column;gap:14px}
+.scroll{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+svg text{font-family:var(--body);fill:var(--ink)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink-2)}
+.sw{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.row{display:grid;grid-template-columns:minmax(120px,210px) minmax(0,1fr) 64px;gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .name{font-size:13.5px;min-width:0}
+.row .n{font-size:12.5px;color:var(--ink-3);text-align:right;font-variant-numeric:tabular-nums}
+.bar{display:flex;height:16px;gap:2px;min-width:0}
+.bar i{display:block;height:100%;border-radius:2px;min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:10px 16px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:6px 10px;border-top:1px solid var(--line);vertical-align:top}
+th{font-weight:600;color:var(--ink-2);border-top:0;white-space:nowrap}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+code{font-family:var(--mono);font-size:12px}
+select{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);max-width:100%}
+select:focus-visible,summary:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+details summary{cursor:pointer;font-weight:500;padding:6px 0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.tree{font-size:13.5px;line-height:1.9;margin:0;padding:0;list-style:none}
+.tree ul{list-style:none;margin:0;padding-left:20px;border-left:1px solid var(--line)}
+.tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:6px}
+.note{font-size:13px;color:var(--ink-3)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">TCC · Data contracts → ontologia · versão 0.2 · corpus <span id="commit"></span></div>
+    <h1>Ontologia TIAGO-ONS</h1>
+    <p style="margin-top:10px">O esquema foi escrito à mão, reaproveitando vocabulários padrão. O conteúdo foi gerado por script a partir dos 80 data contracts do ONS, e cada item do contrato foi registrado como semântico, literal ou descartado.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <section>
+    <div><h2>Mapa de classes</h2>
+    <p>Cada caixa é uma classe da ontologia, com o número de instâncias geradas. As setas saem do Dataset, que corresponde a um contrato.</p></div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--std)"></span>estende um vocabulário padrão (DCAT, RDF Data Cube, CSVW, SKOS)</span>
+      <span><span class="sw" style="background:var(--own)"></span>conceito próprio do domínio ONS</span>
+    </div>
+    <div class="scroll"><svg id="map" viewBox="0 0 980 470" width="980" height="470" role="img" aria-label="Mapa das classes da ontologia"></svg></div>
+    <div class="cols">
+      <div class="panel">
+        <strong>Hierarquia espacial</strong>
+        <ul class="tree"><li>SIN <span class="tag">≈ cim:GeographicalRegion</span>
+          <ul><li>Subsistema <span class="tag">≈ cim:SubGeographicalRegion</span>
+            <ul><li>REE <span class="tag">sem equivalente</span><ul><li>Reservatório <span class="tag">≈ cim:Reservoir</span></li></ul></li>
+            <li>Usina <span class="tag">≈ cim:GeneratingUnit</span><ul><li>Usina hidrelétrica <span class="tag">≈ cim:HydroPowerPlant</span></li></ul></li>
+            <li>Subestação <span class="tag">≈ cim:Substation</span></li></ul></li>
+          <li>Bacia <span class="tag">sem equivalente</span><ul><li>Reservatório</li></ul></li>
+          <li>Linha de transmissão <span class="tag">≈ cim:ACLineSegment</span></li></ul></li></ul>
+        <p class="note">Os nomes de classe do CIM ainda não foram conferidos na norma.</p>
+      </div>
+      <div class="panel">
+        <strong>O que mudou em relação à versão 0.1</strong>
+        <table><tr><th></th><th>0.1 (Kiro)</th><th>0.2</th></tr>
+        <tr><td>Itens de contrato representados</td><td class="num">3 tipos</td><td class="num" id="ntypes"></td></tr>
+        <tr><td>Métricas com unidade e regra de agregação</td><td class="num">0</td><td class="num" id="nmetrics"></td></tr>
+        <tr><td>Colunas</td><td class="num">0</td><td class="num" id="ncols"></td></tr>
+        <tr><td>Usina ligada a reservatório</td><td>todas</td><td>só hidrelétricas</td></tr>
+        <tr><td>Origem do conteúdo</td><td>parte à mão</td><td>100% gerado</td></tr></table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div><h2>Contrato comparado com a ontologia</h2>
+    <p>Cada barra mostra, para um bloco do contrato, quanto do conteúdo chegou à ontologia e de que forma. A largura é proporcional dentro de cada bloco.</p></div>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--sem)"></span>semântico: vira nó ou conceito ligado no grafo</span>
+      <span><span class="sw" style="background:var(--lit)"></span>literal: texto ou SQL preservado, mas opaco</span>
+      <span><span class="sw" style="background:var(--drop)"></span>descartado</span>
+    </div>
+    <div class="panel" id="groups"></div>
+    <details><summary>Ver tabela por item do contrato</summary>
+      <div class="scroll" style="border:0"><table id="tbl"><tr><th>Bloco</th><th>Item do contrato</th><th>Semântico</th><th>Literal</th><th>Descartado</th><th>Vocabulário</th></tr></table></div>
+    </details>
+  </section>
+
+  <section>
+    <div><h2>Por dataset</h2>
+    <p>Escolha um contrato para ver quanto dele foi representado.</p></div>
+    <select id="pick" aria-label="Dataset"></select>
+    <div class="panel" id="one"></div>
+  </section>
+</div>
+
+<script>
+const D = __DATA__;
+const fmt = n => n.toLocaleString('pt-BR');
+const pct = (a,b) => b ? (100*a/b).toFixed(1).replace('.',',')+'%' : '–';
+document.getElementById('commit').textContent = D.commit;
+const T = D.total, den = T.semantic+T.literal+T.dropped;
+document.getElementById('stats').innerHTML = [
+  [fmt(D.contracts),'contratos migrados'],[fmt(D.triples),'triplas geradas'],
+  [pct(T.semantic,den),'do conteúdo virou semântico'],[pct(T.literal,den),'ficou como literal'],
+  [pct(T.dropped,den),'foi descartado'],[pct(D.vocab.standard,D.vocab.standard+D.vocab.own),'usa vocabulário padrão']
+].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join('');
+document.getElementById('ntypes').textContent = D.constructs.length+' tipos';
+document.getElementById('nmetrics').textContent = fmt(D.classes['ons:Metric']||0);
+document.getElementById('ncols').textContent = fmt(D.classes['ons:Column']||0);
+
+// class map
+const N = (id,x,y,label,cls,base,std)=>({id,x,y,label,cls,base,std});
+const nodes = [
+  N('ds',410,200,'Dataset','ons:Dataset','dcat:Dataset',1),
+  N('col',180,40,'Coluna','ons:Column','csvw:Column',1),
+  N('met',180,125,'Métrica','ons:Metric','qb:MeasureProperty',1),
+  N('dim',180,210,'Dimensão','ons:Dimension','qb:DimensionProperty',1),
+  N('val',180,295,'Apelido de valor','ons:ValueAlias','skos:notation',0),
+  N('tpl',180,380,'Consulta modelo','ons:QueryTemplate','SQL',0),
+  N('qk',10,80,'Grandeza','ons:QuantityKind','≈ QUDT',0),
+  N('un',10,165,'Unidade','ons:Unit','≈ QUDT',0),
+  N('ag',10,250,'Agregação','ons:Aggregation','',0),
+  N('dom',660,40,'Domínio','ons:Domain','skos:Concept',0),
+  N('fam',660,125,'Família','ons:Family','skos:Concept',0),
+  N('per',660,210,'Perspectiva','ons:Perspective','skos:Concept',0),
+  N('use',660,295,'Caso de uso','ons:UseCase','skos:Concept',0),
+  N('sp',660,380,'Entidade espacial','ons:SpatialEntityType','≈ CIM',0),
+];
+const W=150,H=56, by=Object.fromEntries(nodes.map(n=>[n.id,n]));
+const edges=[['ds','col','temColuna'],['ds','met','temMétrica'],['ds','dim','temDimensão'],['ds','val','temApelido'],['ds','tpl','temConsulta'],
+ ['met','qk','grandeza'],['met','un','unidade'],['met','ag','agregação'],
+ ['ds','dom','domínio'],['ds','fam','família'],['ds','per','perspectiva'],['ds','use','casoDeUso'],['ds','sp','grão']];
+let s='<defs><marker id="ar" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="var(--ink-3)"/></marker></defs>';
+for(const [a,b,l] of edges){const A=by[a],B=by[b],left=B.x<A.x;
+  const x1=left?A.x:A.x+W,y1=A.y+H/2,x2=left?B.x+W:B.x,y2=B.y+H/2;
+  s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="var(--ink-3)" stroke-width="1.2" marker-end="url(#ar)"/>`;
+  s+=`<text x="${(x1+2*x2)/3}" y="${(y1+2*y2)/3-5}" font-size="10.5" text-anchor="middle" style="fill:var(--ink-3)">${l}</text>`;}
+for(const n of nodes){const c=n.std?'var(--std)':'var(--own)',cnt=D.classes[n.cls];
+  s+=`<g><title>${n.cls}${n.base?' · '+n.base:''}</title><rect x="${n.x}" y="${n.y}" width="${W}" height="${H}" rx="5" fill="var(--surface)" stroke="${c}" stroke-width="1.6"/>`
+   +`<rect x="${n.x}" y="${n.y}" width="5" height="${H}" fill="${c}"/>`
+   +`<text x="${n.x+14}" y="${n.y+22}" font-size="13.5" font-weight="600">${n.label}</text>`
+   +`<text x="${n.x+14}" y="${n.y+40}" font-size="11" style="fill:var(--ink-2)">${cnt!=null?fmt(cnt)+' · ':''}${n.base}</text></g>`;}
+document.getElementById('map').innerHTML=s;
+
+// bars
+const bar=o=>{const t=o.semantic+o.literal+o.dropped;return `<div class="bar" title="semântico ${fmt(o.semantic)} · literal ${fmt(o.literal)} · descartado ${fmt(o.dropped)}">`
+  +[['sem',o.semantic],['lit',o.literal],['drop',o.dropped]].filter(x=>x[1]).map(([k,v])=>`<i style="flex:${v} 1 0;background:var(--${k})"></i>`).join('')+'</div>';};
+document.getElementById('groups').innerHTML=D.groups.map(g=>`<div class="row"><div class="name">${g.name}<div class="note">${pct(g.semantic,g.semantic+g.literal+g.dropped)} semântico</div></div>${bar(g)}<div class="n">${fmt(g.semantic+g.literal+g.dropped)}</div></div>`).join('');
+document.getElementById('tbl').insertAdjacentHTML('beforeend',D.constructs.map(c=>`<tr><td>${c.group}</td><td><code>${c.name}</code></td><td class="num">${fmt(c.semantic)}</td><td class="num">${fmt(c.literal)}</td><td class="num">${fmt(c.dropped)}</td><td>${c.vocab}</td></tr>`).join(''));
+
+// per dataset
+const pick=document.getElementById('pick');
+pick.innerHTML=D.datasets.map((d,i)=>`<option value="${i}">${d.name}</option>`).join('');
+const show=()=>{const d=D.datasets[pick.value];
+  document.getElementById('one').innerHTML=`<div class="row"><div class="name">${d.name}<div class="note">${pct(d.semantic,d.semantic+d.literal+d.dropped)} semântico</div></div>${bar(d)}<div class="n">${fmt(d.semantic+d.literal+d.dropped)}</div></div>`
+   +`<p class="note" style="padding:8px 0">${fmt(d.semantic)} itens semânticos, ${fmt(d.literal)} literais, ${fmt(d.dropped)} descartados${d.na?`, ${fmt(d.na)} declarados como vazios no contrato`:''}.</p>`;};
+pick.addEventListener('change',show); show();
+</script>

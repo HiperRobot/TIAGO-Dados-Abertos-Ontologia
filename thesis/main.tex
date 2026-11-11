@@ -1,0 +1,131 @@
+% Projeto Final II (INF1951) -- PUC-Rio, Departamento de Informatica
+% Layout follows the "Manual do Aluno, Projeto Final II" (Baffa & Mathias Filho, 2023):
+% A4, Arial 11 (Helvetica clone here), 1.5 line spacing, 1 cm paragraph indent,
+% margins 2.5 cm top/bottom and 3.5 cm left/right, no blank line between paragraphs,
+% page number at the top right starting at the Introduction, ABNT references.
+\documentclass[11pt,a4paper,oneside]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil,english]{babel}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[top=2.5cm,bottom=2.5cm,left=3.5cm,right=3.5cm,headheight=1cm,footskip=0cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{1cm}
+\setlength{\parskip}{0pt}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage[alf]{abntex2cite} % ABNT NBR 6023, author-year
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[R]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+% ---- work data (edit here) -------------------------------------------------
+\newcommand{\thesistitle}{A Case Study on Migrating Data Contracts to Ontologies for Agent Consumption}
+\newcommand{\thesisauthor}{Thiago Henriques Pinto}
+\newcommand{\thesisadvisor}{Marcos Kalinowski}
+\newcommand{\thesisdate}{\todo{m\^es} de 2026}
+
+\begin{document}
+\pagenumbering{gobble}
+
+% ---- Capa ------------------------------------------------------------------
+\begin{titlepage}
+\begin{flushright}
+{\scshape Pontif\'icia Universidade Cat\'olica do Rio de Janeiro}\par
+\vspace{5cm}
+{\LARGE\bfseries \thesistitle\par}
+\vspace{3cm}
+{\Large\bfseries \thesisauthor\par}
+\vspace{3cm}
+{\scshape Projeto Final de Gradua\c{c}\~ao}\par
+\vspace{3cm}
+{\scshape Centro T\'ecnico Cient\'ifico -- CTC}\par
+{\scshape Departamento de Inform\'atica}\par
+Curso de Gradua\c{c}\~ao em Ci\^encia da Computa\c{c}\~ao\par
+\vfill
+Rio de Janeiro, \thesisdate
+\end{flushright}
+\end{titlepage}
+
+% ---- Folha de rosto --------------------------------------------------------
+\begin{flushright}
+\vspace*{2cm}
+% \includegraphics[width=2.2cm]{figures/puc-logo} % add the PUC-Rio logo file
+\vspace{3cm}
+{\large\bfseries \thesisauthor\par}
+\vspace{4cm}
+{\Large\bfseries \thesistitle\par}
+\vspace{3cm}
+\begin{minipage}{0.62\textwidth}
+\begin{singlespace}
+Relat\'orio de Projeto Final, apresentado ao programa de Gradua\c{c}\~ao do
+Departamento de Inform\'atica da PUC-Rio como requisito parcial para a
+obten\c{c}\~ao do t\'itulo de Bacharel em Ci\^encia da Computa\c{c}\~ao.
+\end{singlespace}
+\end{minipage}\par
+\vspace{2cm}
+Orientador: \thesisadvisor\par
+\vfill
+Rio de Janeiro\par \thesisdate
+\end{flushright}
+\clearpage
+
+% ---- Resumo / Abstract (max. 250 words each, up to five keywords) -----------
+\selectlanguage{brazil}
+\section*{Resumo}
+\begin{singlespace}
+\noindent Pinto, Thiago Henriques. Kalinowski, Marcos. \thesistitle. Rio de Janeiro, 2026.
+\todo{n} p. Relat\'orio de Projeto Final II -- Departamento de Inform\'atica.
+Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
+
+\vspace{1em}
+\noindent \todo{Resumo em portugu\^es: objetivo, m\'etodo, resultados e conclus\~oes, em um par\'agrafo.}
+
+\vspace{1em}
+\noindent\textbf{Palavras-chave}\par
+\noindent \todo{at\'e cinco}: contratos de dados; ontologias; agentes baseados em LLM; Model Context Protocol; estudo de caso.
+\end{singlespace}
+
+\selectlanguage{english}
+\section*{Abstract}
+\begin{singlespace}
+\noindent Pinto, Thiago Henriques. Kalinowski, Marcos. \thesistitle. Rio de Janeiro, 2026.
+\todo{n} pages. Undergraduate Thesis II -- Departamento de Inform\'atica.
+Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
+
+\vspace{1em}
+\noindent \todo{Abstract: goal, method, results and conclusions, one paragraph.}
+
+\vspace{1em}
+\noindent\textbf{Keywords}\par
+\noindent data contracts; ontologies; LLM-based agents; Model Context Protocol; case study.
+\end{singlespace}
+\clearpage
+
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+\input{chapters/1-introduction}
+\input{chapters/2-background}
+\input{chapters/3-related-work}
+\input{chapters/4-case-study}
+\input{chapters/5-conclusion}
+
+\bibliography{references}
+\end{document}

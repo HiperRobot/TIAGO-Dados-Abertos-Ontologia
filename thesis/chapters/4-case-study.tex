@@ -1,0 +1,124 @@
+\chapter{Case Study on Migrating Data Contracts to Ontologies}
+\label{ch:case}
+
+\section{Introduction}
+\todo{Why a case study: a contemporary phenomenon studied in its real context, where the
+boundary between the migration and the server cannot be controlled
+\cite{runeson2012case}. State the type: single case, exploratory and descriptive.}
+
+\section{Goal and Research Questions}
+\label{sec:goal-rqs}
+\begin{description}[leftmargin=1cm]
+\item[RQ1 (Effort)] What steps, decisions and effort were required to derive the ontology from the data contracts?
+\item[RQ2 (Fidelity)] To what extent are the constructs of the data contracts represented in the ontology as typed knowledge, as opaque literals, or not at all?
+\item[RQ3 (Routing effectiveness)] How does dataset routing accuracy change when the server is fed by the contracts, by the ontology, or by both?
+\item[RQ4 (Answer correctness)] \todo{LLM round on Amazon Bedrock: execution accuracy and executable-but-wrong answers per condition. Not yet collected.}
+\item[RQ5 (Cost)] \todo{Context tokens delivered to the agent per condition. Not yet collected.}
+\end{description}
+
+\section{Context and Case Selection}
+The case is TIAGO Dados Abertos, an open-source MCP server maintained by the Brazilian
+power system operator (ONS). At version 1.1.0 it describes 80 open datasets with 80 ODCS
+data contracts, 887 columns and 351 governed metrics. It exposes four tools
+(\texttt{buscar\_dataset}, \texttt{listar\_datasets}, \texttt{descrever\_dataset},
+\texttt{executar\_sql}); dataset routing combines BM25 with keyword rules.
+\todo{Role of the author in the organisation; why this case; manual item 5 (architecture
+figure and description of the system).}
+
+\section{Data Collection}
+\begin{itemize}[leftmargin=1.5cm]
+\item \textbf{Contracts and ontology.} The ontology schema (T-Box) was written by hand,
+reusing DCAT, RDF Data Cube, CSVW, SKOS and QUDT. Its content (A-Box, 39{,}390 triples) is
+generated from the contracts by a script that records every construct occurrence in a ledger.
+\item \textbf{Question sets.} Two sets written by ONS staff for an earlier system: a curated
+test battery (133 questions, of which 106 are usable for routing) and a selector benchmark
+(204 questions with exactly one correct dataset). \todo{Authorisation from ONS; provenance
+of the 204 set.}
+\item \textbf{Process records.} The log of the first, exploratory attempt made with an AI
+coding assistant: 1{,}025 logged events and 73 file snapshots over three working sessions
+(43, 22 and 8 snapshots), plus the version history of the second attempt.
+\end{itemize}
+
+\section{Analysis}
+\todo{RQ2: share of construct occurrences per level, and share carried by standard
+vocabularies. RQ3: top-1, top-3 and MRR with Wilson intervals; exact McNemar tests on paired
+top-1 outcomes with Holm correction; paired bootstrap for differences. The production router
+is never modified: only the catalogue it receives changes.}
+
+\section{Results}
+
+\subsection{RQ1: Effort}
+\todo{Timeline of the two attempts, decisions, and what each attempt cost. First attempt:
+three sessions, hand-curated aliases, coverage of three contract constructs. Second attempt:
+generator of about 400 lines, no hand-written instance data.}
+
+\subsection{RQ2: Fidelity}
+Table~\ref{tab:fidelity} shows what happened to the 26{,}839 construct occurrences found in
+the 80 contracts (484 further occurrences are explicit ``no value'' markers and are left out).
+
+\begin{table}[ht]
+\centering\small
+\caption{Construct occurrences of the data contracts by level of representation in the ontology.}
+\label{tab:fidelity}
+\begin{tabular}{lrrr}
+\toprule
+Contract block & Semantic & Literal & Dropped \\
+\midrule
+Catalogue and identity & 2{,}063 & 240 & 0 \\
+Grain, dimensions and classification & 1{,}304 & 164 & 4 \\
+Metrics & 4{,}045 & 2{,}357 & 0 \\
+Columns & 5{,}758 & 5{,}513 & 0 \\
+Value aliases & 1{,}606 & 0 & 16 \\
+Agent support (questions and SQL) & 413 & 1{,}217 & 0 \\
+Physical layer and operations & 0 & 1{,}297 & 842 \\
+\midrule
+Total & 15{,}189 (56.6\%) & 10{,}788 (40.2\%) & 862 (3.2\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\todo{Vocabulary reuse: 13{,}480 of the 25{,}977 represented occurrences use a standard
+vocabulary. Only 14 of 45 units have a QUDT equivalent; MWmed, MWmes and R\$/MWh do not.
+Inconsistencies surfaced by the migration (domain and unit spellings, aggregation names).}
+
+\subsection{RQ3: Routing effectiveness}
+\begin{table}[ht]
+\centering\small
+\caption{Top-1 routing accuracy (95\% Wilson interval) on the two human-written question sets.}
+\label{tab:routing}
+\begin{tabular}{lcc}
+\toprule
+Catalogue given to the router & Battery v2 ($n=106$) & Selector set ($n=204$) \\
+\midrule
+Schema only & 0.330 [0.25, 0.42] & 0.382 [0.32, 0.45] \\
+Contracts (production) & 0.679 [0.59, 0.76] & 0.750 [0.69, 0.80] \\
+Contracts + ontology re-rank & 0.689 [0.60, 0.77] & 0.745 [0.68, 0.80] \\
+Ontology, semantic content only & 0.632 [0.54, 0.72] & 0.667 [0.60, 0.73] \\
+Ontology, semantic and literal content & 0.679 [0.59, 0.76] & 0.750 [0.69, 0.80] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\todo{Reading. (i) The ontology with all content reproduces the contracts exactly: no
+discordant question in either set. (ii) Semantic content alone loses 5 to 8 points; the
+difference is significant only on the larger set (Holm-adjusted $p=0.035$). (iii) The
+family-grain re-rank changes one question in each set, in opposite directions. (iv) Hard
+questions remain at 0.40 under every condition.}
+
+\subsection{RQ4: Answer correctness}
+\todo{Pending the LLM round.}
+
+\subsection{RQ5: Cost}
+\todo{Pending.}
+
+\section{Discussion and Lessons Learned}
+\todo{An ontology derived from complete contracts is a lossless carrier for routing, so its
+value must come from what contracts cannot express. Free text and example questions carry
+5 to 8 points of routing accuracy. The first attempt failed because it kept structure and
+dropped vocabulary.}
+
+\section{Threats to Validity}
+\todo{Construct, internal, external and reliability, following \citeonline{runeson2012case}.}
+
+\section{Concluding Remarks}
+\todo{}

@@ -1,7 +1,7 @@
 {
- "corpus_commit": "51ef895",
+ "corpus_commit": "94af8d4",
  "contracts": 80,
- "triples": 39242,
+ "triples": 39390,
  "nodes_by_class": {
   "ons:ValueAlias": 1604,
   "ons:Column": 887,

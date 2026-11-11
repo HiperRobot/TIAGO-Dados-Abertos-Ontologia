@@ -85,6 +85,8 @@ ons:defaultOfFamily a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range 
 ons:hasPerspective  a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Perspective .
 ons:supportsUseCase a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:UseCase .
 ons:primaryUseCase  a owl:ObjectProperty ; rdfs:subPropertyOf ons:supportsUseCase .
+ons:doesNotSupportUseCase a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:UseCase ;
+    skos:definition "The contract states explicitly that this use case is not supported."@en .
 ons:hasStatus       a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Status .
 
 # ── 3. Grain: space and time ────────────────────────────────────

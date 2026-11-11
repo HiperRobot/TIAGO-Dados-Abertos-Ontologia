@@ -1,0 +1,218 @@
+{
+ "gold": "golden_204.jsonl",
+ "n": 204,
+ "corpus_commit": "94af8d4",
+ "datasets": {
+  "schema": 80,
+  "contracts": 80,
+  "onto_sem": 80,
+  "onto_full": 80
+ },
+ "conditions": {
+  "schema": {
+   "n": 204,
+   "top1": 0.38235294117647056,
+   "top1_ci95": [
+    0.318423508480034,
+    0.4506313871712696
+   ],
+   "top3": 0.6225490196078431,
+   "top5": 0.7401960784313726,
+   "mrr": 0.5110352474323062
+  },
+  "contracts": {
+   "n": 204,
+   "top1": 0.75,
+   "top1_ci95": [
+    0.6863285847970251,
+    0.8044297619439547
+   ],
+   "top3": 0.9313725490196079,
+   "top5": 0.9509803921568627,
+   "mrr": 0.8419176003734827
+  },
+  "contracts+onto": {
+   "n": 204,
+   "top1": 0.7450980392156863,
+   "top1_ci95": [
+    0.681145590821063,
+    0.7999900432387211
+   ],
+   "top3": 0.9313725490196079,
+   "top5": 0.9509803921568627,
+   "mrr": 0.8394666199813259
+  },
+  "onto_sem": {
+   "n": 204,
+   "top1": 0.6666666666666666,
+   "top1_ci95": [
+    0.5994231103245794,
+    0.7277491208360737
+   ],
+   "top3": 0.8823529411764706,
+   "top5": 0.9215686274509803,
+   "mrr": 0.7761204481792717
+  },
+  "onto_full": {
+   "n": 204,
+   "top1": 0.75,
+   "top1_ci95": [
+    0.6863285847970251,
+    0.8044297619439547
+   ],
+   "top3": 0.9313725490196079,
+   "top5": 0.9509803921568627,
+   "mrr": 0.842734593837535
+  }
+ },
+ "paired": {
+  "schema vs contracts": {
+   "only_a": 8,
+   "only_b": 83,
+   "p": 7.57684143871343e-17,
+   "p_holm": 3.7884207193567147e-16,
+   "top1_diff": [
+    0.36764705882352944,
+    0.28921568627450983,
+    0.44607843137254904
+   ],
+   "mrr_diff": [
+    0.33088235294117646,
+    0.2711601307189543,
+    0.39179505135387493
+   ]
+  },
+  "contracts vs contracts+onto": {
+   "only_a": 1,
+   "only_b": 0,
+   "p": 1.0,
+   "p_holm": 1.0,
+   "top1_diff": [
+    -0.004901960784313725,
+    -0.014705882352941176,
+    0.0
+   ],
+   "mrr_diff": [
+    -0.0024509803921568627,
+    -0.007352941176470588,
+    0.0
+   ]
+  },
+  "contracts vs onto_full": {
+   "only_a": 0,
+   "only_b": 0,
+   "p": 1.0,
+   "p_holm": 1.0,
+   "top1_diff": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mrr_diff": [
+    0.0008169934640522877,
+    0.0,
+    0.0024509803921568627
+   ]
+  },
+  "contracts vs onto_sem": {
+   "only_a": 29,
+   "only_b": 12,
+   "p": 0.011507789735333063,
+   "p_holm": 0.03452336920599919,
+   "top1_diff": [
+    -0.08333333333333333,
+    -0.14215686274509803,
+    -0.024509803921568627
+   ],
+   "mrr_diff": [
+    -0.06579715219421102,
+    -0.10205415499533146,
+    -0.030152894491129786
+   ]
+  },
+  "schema vs onto_sem": {
+   "only_a": 12,
+   "only_b": 70,
+   "p": 4.1079115101301e-11,
+   "p_holm": 1.64316460405204e-10,
+   "top1_diff": [
+    0.28431372549019607,
+    0.20588235294117646,
+    0.3627450980392157
+   ],
+   "mrr_diff": [
+    0.26508520074696545,
+    0.20525210084033615,
+    0.3263246965452848
+   ]
+  }
+ },
+ "by_stratum": {
+  "direct": {
+   "n": 103,
+   "schema": 0.5631067961165048,
+   "contracts": 0.8058252427184466,
+   "contracts+onto": 0.8058252427184466,
+   "onto_sem": 0.7378640776699029,
+   "onto_full": 0.8058252427184466
+  },
+  "disambiguation": {
+   "n": 54,
+   "schema": 0.2777777777777778,
+   "contracts": 0.7592592592592593,
+   "contracts+onto": 0.7407407407407407,
+   "onto_sem": 0.6481481481481481,
+   "onto_full": 0.7592592592592593
+  },
+  "inference": {
+   "n": 43,
+   "schema": 0.11627906976744186,
+   "contracts": 0.6046511627906976,
+   "contracts+onto": 0.6046511627906976,
+   "onto_sem": 0.5348837209302325,
+   "onto_full": 0.6046511627906976
+  },
+  "linguistic": {
+   "n": 4,
+   "schema": 0.0,
+   "contracts": 0.75,
+   "contracts+onto": 0.75,
+   "onto_sem": 0.5,
+   "onto_full": 0.75
+  }
+ },
+ "changed_by_ontology": [
+  {
+   "id": "sem_025",
+   "valid": [
+    "intercambio_modalidade"
+   ],
+   "contracts": [
+    "intercambio_modalidade",
+    "intercambio-internacional",
+    "geracao-exportacao-internacional"
+   ],
+   "contracts+onto": [
+    "intercambio-internacional",
+    "intercambio_modalidade",
+    "geracao-exportacao-internacional"
+   ]
+  },
+  {
+   "id": "gen_029",
+   "valid": [
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia"
+   ],
+   "contracts": [
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia",
+    "ena-diario-por-reservatorio",
+    "ena-diario-por-subsistema"
+   ],
+   "contracts+onto": [
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia",
+    "ena-diario-por-subsistema",
+    "ena-diario-por-reservatorio"
+   ]
+  }
+ ]
+}
