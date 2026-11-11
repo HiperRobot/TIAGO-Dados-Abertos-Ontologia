@@ -1,0 +1,163 @@
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix dcat:  <http://www.w3.org/ns/dcat#> .
+@prefix qb:    <http://purl.org/linked-data/cube#> .
+@prefix csvw:  <http://www.w3.org/ns/csvw#> .
+@prefix qudt:  <http://qudt.org/schema/qudt/> .
+@prefix cim:   <http://iec.ch/TC57/CIM100#> .
+@prefix ons:   <https://w3id.org/tiago-ons/onto#> .
+
+#################################################################
+# TIAGO-ONS ontology, T-Box (schema level), v0.2
+#
+# Hand-written. The A-Box (datasets, columns, metrics, ...) is NOT
+# written by hand: study/ontology/build_abox.py derives it from the
+# ODCS data contracts in contracts/ons/*.odcs.yaml.
+#
+# Design rules
+#  1. Reuse before invent: DCAT/DCT for dataset metadata, RDF Data
+#     Cube (qb) for measures and dimensions, CSVW for columns, SKOS
+#     for controlled vocabularies, QUDT for quantity kinds and units.
+#  2. Domain concepts with no standard equivalent (subsystem, REE,
+#     EAR, ENA, CMO, MWmed, MWmes) live in the ons: namespace.
+#  3. Alignments to IEC CIM are skos:closeMatch only. The CIM class
+#     names and the namespace IRI below MUST be checked against the
+#     official CIM profile before publication (not yet verified).
+#  4. The namespace https://w3id.org/tiago-ons/ is provisional.
+#################################################################
+
+ons: a owl:Ontology ;
+    rdfs:label "TIAGO-ONS: ontology of the ONS open-data catalogue"@en ;
+    owl:versionInfo "0.2.0" .
+
+# ── 1. Catalogue ────────────────────────────────────────────────
+ons:Dataset a owl:Class ; rdfs:subClassOf dcat:Dataset ;
+    rdfs:label "Dataset"@en ;
+    skos:definition "One published ONS open-data table, described by one ODCS data contract."@en .
+
+ons:Column a owl:Class ; rdfs:subClassOf csvw:Column ;
+    rdfs:label "Column"@en .
+
+ons:Metric a owl:Class ; rdfs:subClassOf qb:MeasureProperty ;
+    rdfs:label "Metric"@en ;
+    skos:definition "A governed measure of a dataset: one or more columns plus the rules for aggregating them."@en .
+
+ons:Dimension a owl:Class ; rdfs:subClassOf qb:DimensionProperty ;
+    rdfs:label "Dimension"@en ;
+    skos:definition "A column that plays a known slicing role (subsystem, plant, basin, ...)."@en .
+
+ons:QueryTemplate a owl:Class ;
+    rdfs:label "Query template"@en ;
+    skos:definition "A parameterised or example SQL query attached to a dataset."@en .
+
+ons:ValueAlias a owl:Class ;
+    rdfs:label "Value alias"@en ;
+    skos:definition "A coded value of a column with the natural-language names users give it."@en .
+
+ons:hasColumn     a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Column .
+ons:hasMetric     a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Metric .
+ons:hasDimension  a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Dimension .
+ons:hasTemplate   a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:QueryTemplate .
+ons:hasValueAlias a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:ValueAlias .
+ons:computedFrom  a owl:ObjectProperty ; rdfs:domain ons:Metric ; rdfs:range ons:Column .
+ons:onColumn      a owl:ObjectProperty ; rdfs:range ons:Column .
+ons:usesMetric    a owl:ObjectProperty ; rdfs:domain ons:QueryTemplate ; rdfs:range ons:Metric .
+ons:rowKey        a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Column ;
+    skos:definition "Column that is part of the row grain (one row per combination of row keys)."@en .
+ons:timeColumn    a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Column .
+
+# ── 2. What a dataset is about ──────────────────────────────────
+ons:Domain a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Business domain"@en .
+ons:Family a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Measure family"@en ;
+    skos:definition "Group of datasets that publish the same phenomenon at different grains (e.g. EAR by subsystem, basin, reservoir)."@en .
+ons:Perspective a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Temporal perspective"@en ;
+    skos:definition "Whether values are verified, scheduled, forecast or registry data."@en .
+ons:UseCase a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Query use case"@en .
+ons:Status  a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Lifecycle status"@en .
+
+ons:inDomain        a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Domain .
+ons:inFamily        a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Family .
+ons:defaultOfFamily a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Family .
+ons:hasPerspective  a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Perspective .
+ons:supportsUseCase a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:UseCase .
+ons:primaryUseCase  a owl:ObjectProperty ; rdfs:subPropertyOf ons:supportsUseCase .
+ons:hasStatus       a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Status .
+
+# ── 3. Grain: space and time ────────────────────────────────────
+ons:SpatialEntityType a owl:Class ; rdfs:label "Type of spatial / electrical entity"@en .
+
+ons:partOf a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:domain ons:SpatialEntityType ; rdfs:range ons:SpatialEntityType ;
+    skos:definition "Values at the subject grain can be rolled up to the object grain."@en .
+
+ons:SIN          a ons:SpatialEntityType ; rdfs:label "National Interconnected System (SIN)"@en ;
+    skos:altLabel "sin"@pt , "nacional"@pt , "brasil"@pt , "sistema interligado nacional"@pt ;
+    skos:closeMatch cim:GeographicalRegion .
+ons:Subsistema   a ons:SpatialEntityType ; rdfs:label "Subsystem"@en ; ons:partOf ons:SIN ;
+    skos:altLabel "subsistema"@pt , "submercado"@pt , "regiao eletrica"@pt ;
+    skos:closeMatch cim:SubGeographicalRegion .
+ons:Bacia        a ons:SpatialEntityType ; rdfs:label "River basin"@en ; ons:partOf ons:SIN ;
+    skos:altLabel "bacia"@pt , "bacia hidrografica"@pt ;
+    skos:note "A basin can span more than one subsystem, so it rolls up to SIN, not to Subsistema."@en .
+ons:REE          a ons:SpatialEntityType ; rdfs:label "Equivalent energy reservoir (REE)"@en ; ons:partOf ons:Subsistema ;
+    skos:altLabel "ree"@pt , "reservatorio equivalente"@pt .
+ons:Reservatorio a ons:SpatialEntityType ; rdfs:label "Reservoir"@en ; ons:partOf ons:REE , ons:Bacia ;
+    skos:altLabel "reservatorio"@pt ; skos:closeMatch cim:Reservoir .
+ons:Usina        a ons:SpatialEntityType ; rdfs:label "Power plant"@en ; ons:partOf ons:Subsistema ;
+    skos:altLabel "usina"@pt ; skos:closeMatch cim:GeneratingUnit ;
+    skos:note "Plants roll up to a subsystem. Only hydro plants relate to a reservoir (ons:hasReservoir)."@en .
+ons:UsinaHidreletrica a ons:SpatialEntityType ; rdfs:label "Hydro power plant"@en ; ons:partOf ons:Usina ;
+    skos:altLabel "hidreletrica"@pt , "uhe"@pt ; skos:closeMatch cim:HydroPowerPlant .
+ons:Subestacao   a ons:SpatialEntityType ; rdfs:label "Substation"@en ; ons:partOf ons:Subsistema ;
+    skos:altLabel "subestacao"@pt ; skos:closeMatch cim:Substation .
+ons:Linha        a ons:SpatialEntityType ; rdfs:label "Transmission line"@en ; ons:partOf ons:SIN ;
+    skos:altLabel "linha de transmissao"@pt ; skos:closeMatch cim:ACLineSegment .
+ons:Agente       a ons:SpatialEntityType ; rdfs:label "Market agent"@en ;
+    skos:altLabel "agente"@pt .
+
+ons:hasReservoir a owl:ObjectProperty ; rdfs:domain ons:UsinaHidreletrica ; rdfs:range ons:Reservatorio .
+
+ons:rowEntity   a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:SpatialEntityType ;
+    skos:definition "The entity each row describes. Absent when the contract declares no entity grain."@en .
+ons:spatialGrain a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:SpatialEntityType .
+ons:refersTo     a owl:ObjectProperty ; rdfs:domain ons:Dimension ; rdfs:range ons:SpatialEntityType .
+ons:temporalResolution a owl:DatatypeProperty ; rdfs:subPropertyOf dcat:temporalResolution ;
+    rdfs:domain ons:Dataset .
+
+# ── 4. Quantities, units, aggregation ───────────────────────────
+ons:QuantityKind a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Quantity kind"@en .
+ons:Unit         a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Unit of measure"@en .
+ons:Aggregation  a owl:Class ; rdfs:subClassOf skos:Concept ; rdfs:label "Aggregation function"@en .
+
+ons:quantityKind a owl:ObjectProperty ; rdfs:domain ons:Metric ; rdfs:range ons:QuantityKind .
+ons:unit         a owl:ObjectProperty ; rdfs:range ons:Unit .
+ons:defaultAggregation   a owl:ObjectProperty ; rdfs:domain ons:Metric ; rdfs:range ons:Aggregation .
+ons:forbiddenAggregation a owl:ObjectProperty ; rdfs:domain ons:Metric ; rdfs:range ons:Aggregation ;
+    skos:definition "Aggregation that yields a physically meaningless value for this metric (e.g. SUM over a stock)."@en .
+ons:timeAdditive a owl:DatatypeProperty ; rdfs:domain ons:Metric ; rdfs:range xsd:boolean ;
+    skos:definition "True when values may be summed along time. Derived: false iff SUM is a forbidden aggregation."@en .
+ons:intervalHours a owl:DatatypeProperty ; rdfs:domain ons:Metric ; rdfs:range xsd:decimal .
+
+# ── 5. Literal carriers (content kept, but opaque to reasoning) ─
+ons:expression        a owl:DatatypeProperty ; rdfs:label "SQL expression of a metric"@en .
+ons:aggregationSQL    a owl:DatatypeProperty ; rdfs:label "SQL per aggregation mode (JSON)"@en .
+ons:sqlTemplate       a owl:DatatypeProperty ; rdfs:label "SQL text of a query template"@en .
+ons:exampleQuestion   a owl:DatatypeProperty ; rdfs:label "Natural-language question the dataset answers"@en .
+ons:sourceExpression  a owl:DatatypeProperty ; rdfs:label "Physical read expression"@en .
+ons:castExpression    a owl:DatatypeProperty ; rdfs:label "Cast needed to read a column"@en .
+ons:agentInstruction  a owl:DatatypeProperty ; rdfs:label "Free-text instruction for agents"@en .
+ons:retrievalContext  a owl:DatatypeProperty ; rdfs:label "Free-text retrieval context"@en .
+ons:usage             a owl:DatatypeProperty ; rdfs:label "Intended usage (free text)"@en .
+ons:limitation        a owl:DatatypeProperty ; rdfs:label "Known limitations (free text)"@en .
+ons:freshness         a owl:DatatypeProperty ; rdfs:label "Freshness SLA (free text)"@en .
+ons:filter            a owl:DatatypeProperty ; rdfs:label "SQL filter selecting a coded value"@en .
+ons:semanticRole      a owl:DatatypeProperty ; rdfs:label "Role of a column (METRIC, DIMENSION, IDENTIFIER, TIMESTAMP, FLAG)"@en .
+ons:allowedValue      a owl:DatatypeProperty ; rdfs:label "Enumerated value of a column"@en .
+ons:physicalType      a owl:DatatypeProperty ; rdfs:label "Physical storage type"@en .
+ons:availableFrom     a owl:DatatypeProperty ; rdfs:label "First date a column has data"@en .
+ons:coverageNote      a owl:DatatypeProperty ; rdfs:label "Coverage note of a column"@en .
+ons:outputUnitLabel   a owl:DatatypeProperty ; rdfs:label "Declared output unit of a template"@en .
