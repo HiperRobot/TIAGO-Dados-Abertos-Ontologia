@@ -1,0 +1,389 @@
+{
+  "dataset_bindings": {
+    "balanco-energia-subsistema": {
+      "mede": "Balanco",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "balanco_dessem_detalhe": {
+      "mede": "Programacao",
+      "grao": "Subsistema",
+      "perspectiva": "Programado"
+    },
+    "balanco_dessem_geral": {
+      "mede": "Programacao",
+      "grao": "Subsistema",
+      "perspectiva": "Programado"
+    },
+    "capacidade-geracao": {
+      "mede": "Capacidade",
+      "grao": "Usina",
+      "perspectiva": "Cadastral"
+    },
+    "capacidade-transformacao": {
+      "mede": "Capacidade",
+      "grao": "Subestacao",
+      "perspectiva": "Cadastral"
+    },
+    "carga-energia": {
+      "mede": "Carga",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "carga-mensal": {
+      "mede": "Carga",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "cargaglobal-roraima": {
+      "mede": "Carga",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "classificacao-evt": {
+      "mede": null,
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "cmo-semanal": {
+      "mede": "CustoMarginal",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "cmo-semi-horario": {
+      "mede": "CustoMarginal",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "curva-carga": {
+      "mede": "Carga",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "cvu-usitermica": {
+      "mede": "CustoVariavel",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "dados-hidrologicos-res": {
+      "mede": "Hidrologia",
+      "grao": "Reservatorio",
+      "perspectiva": "Verificado"
+    },
+    "dados_hidrologicos_ho": {
+      "mede": "Hidrologia",
+      "grao": "Reservatorio",
+      "perspectiva": "Verificado"
+    },
+    "demanda_maxima_di": {
+      "mede": "Carga",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "disponibilidade_usina": {
+      "mede": "Disponibilidade",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "ear-diario-por-bacia": {
+      "mede": "EnergiaArmazenada",
+      "grao": "Bacia",
+      "perspectiva": "Verificado"
+    },
+    "ear-diario-por-ree-reservatorio-equivalente-de-energia": {
+      "mede": "EnergiaArmazenada",
+      "grao": "REE",
+      "perspectiva": "Verificado"
+    },
+    "ear-diario-por-reservatorio": {
+      "mede": "EnergiaArmazenada",
+      "grao": "Reservatorio",
+      "perspectiva": "Verificado"
+    },
+    "ear-diario-por-subsistema": {
+      "mede": "EnergiaArmazenada",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "ena-diario-por-bacia": {
+      "mede": "EnergiaNatural",
+      "grao": "Bacia",
+      "perspectiva": "Verificado"
+    },
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia": {
+      "mede": "EnergiaNatural",
+      "grao": "REE",
+      "perspectiva": "Verificado"
+    },
+    "ena-diario-por-reservatorio": {
+      "mede": "EnergiaNatural",
+      "grao": "Reservatorio",
+      "perspectiva": "Verificado"
+    },
+    "ena-diario-por-subsistema": {
+      "mede": "EnergiaNatural",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "energia-vertida-turbinavel": {
+      "mede": "Hidrologia",
+      "grao": "Reservatorio",
+      "perspectiva": "Verificado"
+    },
+    "equipamento-controle-reativo": {
+      "mede": "Cadastro",
+      "grao": "Subestacao",
+      "perspectiva": "Cadastral"
+    },
+    "fator-capacidade-2": {
+      "mede": "FatorCapacidade",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "geracao-exportacao-internacional": {
+      "mede": "Intercambio",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "geracao-termica-despacho-2": {
+      "mede": "Geracao",
+      "grao": "Usina",
+      "perspectiva": "Programado"
+    },
+    "geracao-usina-2": {
+      "mede": "Geracao",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "geracao_itaipu": {
+      "mede": "Geracao",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "grandezas_fluviometricas": {
+      "mede": "Hidrologia",
+      "grao": "Bacia",
+      "perspectiva": "Verificado"
+    },
+    "importacaoenergia-comercial-2": {
+      "mede": "Intercambio",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind-disponibilidade-geracao-sin": {
+      "mede": "Geracao",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_atls": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_ccal": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_ccat": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_ciper": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_dreq_freq": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_energianaosuprida": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_robustez": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_confiarb_severidade": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_disponibilidade_fgeracao_uge_anual": {
+      "mede": "Disponibilidade",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "ind_disponibilidade_fgeracao_uge_mensal": {
+      "mede": "Disponibilidade",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "ind_disponibilidade_ft_conversor": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_disponibilidade_ft_reativo": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_disponibilidade_ft_trlt": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_providencia_ecpa_pcpa": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_qualid_dfd_evento": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_qualid_dfd_meano": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ind_qualid_dfp_regime": {
+      "mede": "Confiabilidade",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "intercambio-internacional": {
+      "mede": "Intercambio",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "intercambio-nacional": {
+      "mede": "Intercambio",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "intercambio_modalidade": {
+      "mede": "Intercambio",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "interrupcao_carga": {
+      "mede": "Carga",
+      "grao": "Subsistema",
+      "perspectiva": "Verificado"
+    },
+    "linha-transmissao": {
+      "mede": "Cadastro",
+      "grao": null,
+      "perspectiva": "Cadastral"
+    },
+    "modalidade-usina": {
+      "mede": "Capacidade",
+      "grao": "Usina",
+      "perspectiva": "Cadastral"
+    },
+    "oferta-resposta-da-demanda": {
+      "mede": "Carga",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "ofertapreco-importacao": {
+      "mede": "Intercambio",
+      "grao": null,
+      "perspectiva": "Verificado"
+    },
+    "programacao_diaria": {
+      "mede": "Programacao",
+      "grao": "Usina",
+      "perspectiva": "Programado"
+    },
+    "programacao_fluxo_controlado": {
+      "mede": "Intercambio",
+      "grao": null,
+      "perspectiva": "Programado"
+    },
+    "programacao_x_previsao": {
+      "mede": "Programacao",
+      "grao": "Usina",
+      "perspectiva": "Previsto"
+    },
+    "reservatorio": {
+      "mede": "Hidrologia",
+      "grao": "Usina",
+      "perspectiva": "Cadastral"
+    },
+    "restricao_coff_eolica_detail": {
+      "mede": "Restricao",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "restricao_coff_eolica_usi": {
+      "mede": "Restricao",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "restricao_coff_fotovoltaica": {
+      "mede": "Restricao",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "restricao_coff_fotovoltaica_detail": {
+      "mede": "Restricao",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "res_volumeespera": {
+      "mede": "Hidrologia",
+      "grao": "Reservatorio",
+      "perspectiva": "Verificado"
+    },
+    "subestacao": {
+      "mede": "Cadastro",
+      "grao": "Subestacao",
+      "perspectiva": "Cadastral"
+    },
+    "taxa_teif_teip": {
+      "mede": "TaxaFalha",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "taxa_teif_teip_oper": {
+      "mede": "TaxaFalha",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "taxa_teif_teip_parametro": {
+      "mede": "TaxaFalha",
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "uge_opera_csi": {
+      "mede": null,
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    },
+    "usina_conjunto": {
+      "mede": "Capacidade",
+      "grao": "Usina",
+      "perspectiva": "Cadastral"
+    },
+    "usina_pqu": {
+      "mede": "Capacidade",
+      "grao": "Usina",
+      "perspectiva": "Cadastral"
+    },
+    "usi_servicoancilar_sandbox": {
+      "mede": null,
+      "grao": "Usina",
+      "perspectiva": "Verificado"
+    }
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "condicoes": {
+    "C0": {
+      "top1": 0.3412698412698413,
+      "top3": 0.5476190476190477,
+      "top5": 0.6825396825396826,
+      "mrr": 0.4696428571428572,
+      "fora_top10": 0.2857142857142857,
+      "n": 126
+    },
+    "C1": {
+      "top1": 0.8015873015873016,
+      "top3": 1.0,
+      "top5": 1.0,
+      "mrr": 0.8955026455026454,
+      "fora_top10": 0.0,
+      "n": 126
+    },
+    "C2": {
+      "top1": 0.8095238095238095,
+      "top3": 1.0,
+      "top5": 1.0,
+      "mrr": 0.8994708994708993,
+      "fora_top10": 0.0,
+      "n": 126
+    },
+    "C3": {
+      "top1": 0.2222222222222222,
+      "top3": 0.42857142857142855,
+      "top5": 0.5396825396825397,
+      "mrr": 0.34210758377425055,
+      "fora_top10": 0.3888888888888889,
+      "n": 126
+    }
+  },
+  "mcnemar": [
+    {
+      "a": "C0",
+      "b": "C1",
+      "b_count": 5,
+      "c_count": 63,
+      "p_valor": 7.651062942926057e-14,
+      "direcao": "C1 > C0"
+    },
+    {
+      "a": "C0",
+      "b": "C2",
+      "b_count": 5,
+      "c_count": 64,
+      "p_valor": 4.119230997967627e-14,
+      "direcao": "C2 > C0"
+    },
+    {
+      "a": "C0",
+      "b": "C3",
+      "b_count": 31,
+      "c_count": 16,
+      "p_valor": 0.03998605682605216,
+      "direcao": "C0 > C3"
+    },
+    {
+      "a": "C1",
+      "b": "C2",
+      "b_count": 0,
+      "c_count": 1,
+      "p_valor": 1.0,
+      "direcao": "C2 > C1"
+    },
+    {
+      "a": "C1",
+      "b": "C3",
+      "b_count": 74,
+      "c_count": 1,
+      "p_valor": 4.0234064994579266e-21,
+      "direcao": "C1 > C3"
+    },
+    {
+      "a": "C2",
+      "b": "C3",
+      "b_count": 75,
+      "c_count": 1,
+      "p_valor": 2.0381730293306602e-21,
+      "direcao": "C2 > C3"
+    }
+  ],
+  "confusao_alvo": {
+    "balanco-energia-subsistema->curva-carga": 1,
+    "balanco_dessem_geral->balanco_dessem_detalhe": 1,
+    "capacidade-transformacao->capacidade-geracao": 1,
+    "cargaglobal-roraima->demanda_maxima_di": 1,
+    "classificacao-evt->energia-vertida-turbinavel": 1,
+    "curva-carga->carga-mensal": 1,
+    "dados_hidrologicos_ho->dados-hidrologicos-res": 1,
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia->ena-diario-por-subsistema": 1,
+    "geracao-termica-despacho-2->balanco-energia-subsistema": 1,
+    "geracao-usina-2->balanco-energia-subsistema": 1,
+    "geracao-usina-2->fator-capacidade-2": 1,
+    "ind-disponibilidade-geracao-sin->ind_disponibilidade_fgeracao_uge_anual": 1,
+    "ind_confiarb_ccal->ind-disponibilidade-geracao-sin": 1,
+    "ind_confiarb_dreq_freq->carga-mensal": 1,
+    "ind_confiarb_energianaosuprida->carga-energia": 1,
+    "ind_confiarb_robustez->carga-mensal": 1,
+    "ind_disponibilidade_fgeracao_uge_anual->disponibilidade_usina": 1,
+    "ind_disponibilidade_ft_conversor->ind_disponibilidade_ft_trlt": 1,
+    "ind_providencia_ecpa_pcpa->ind-disponibilidade-geracao-sin": 1,
+    "ind_qualid_dfd_meano->ind_qualid_dfd_evento": 1
+  }
+}

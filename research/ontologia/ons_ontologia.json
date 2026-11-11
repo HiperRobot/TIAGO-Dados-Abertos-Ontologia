@@ -1,0 +1,75 @@
+{
+  "_comment": "Projeção operacional da ontologia ons_setor_eletrico.ttl, no formato que o harness de roteamento consome. Mantido em sincronia manual com o .ttl. O bloco 'dataset_bindings' pode ser gerado/validado por scripts/gerar_bindings.py a partir de contracts/ons/*.odcs.yaml (semantics.measure_terms, family, temporal_perspective, dimension_columns).",
+  "version": "0.1.0-research",
+
+  "_entidade_mapa_contrato": "A chave 'contrato' lista os valores de semantics.row_grain.entity que mapeiam para esta classe. 'dataset_row' e 'oferta_resposta_demanda' NÃO têm grão espacial e ficam de fora de propósito (grao=null no binding).",
+  "entidades_espaciais": {
+    "SIN":          { "nivel": 0, "parte_de": null,         "aliases": ["sin", "sistema interligado nacional", "brasil", "nacional"], "contrato": ["sin"] },
+    "Subsistema":   { "nivel": 1, "parte_de": "SIN",         "aliases": ["subsistema", "regiao eletrica", "submercado"], "contrato": ["subsistema", "fonte_agregada"] },
+    "REE":          { "nivel": 2, "parte_de": "Subsistema",  "aliases": ["ree", "reservatorio equivalente"], "contrato": ["ree"] },
+    "Bacia":        { "nivel": 2, "parte_de": "Subsistema",  "aliases": ["bacia", "bacia hidrografica"], "contrato": ["bacia"] },
+    "Reservatorio": { "nivel": 3, "parte_de": "REE",         "aliases": ["reservatorio", "represa", "acude"], "contrato": ["reservatorio"] },
+    "Usina":        { "nivel": 4, "parte_de": "Reservatorio","aliases": ["usina", "planta", "empreendimento", "hidreletrica", "termeletrica", "eolica", "solar"], "contrato": ["usina"] },
+    "Subestacao":   { "nivel": 3, "parte_de": "Subsistema",  "aliases": ["subestacao", "se"], "contrato": ["subestacao"] }
+  },
+
+  "subsistemas": {
+    "SE": ["sudeste", "centro-oeste", "se/co", "sudeste centro-oeste", "sudeste co"],
+    "S":  ["sul"],
+    "NE": ["nordeste"],
+    "N":  ["norte"]
+  },
+
+  "grandezas": {
+    "PotenciaMedia":  { "unidade_nativa": "MWmed", "aditividade_temporal": "average",  "aliases": ["potencia media", "mwmed", "mw medio"] },
+    "Energia":        { "unidade_nativa": "MWh",   "aditividade_temporal": "additive", "aliases": ["energia", "mwh", "gwh"] },
+    "EstoqueEnergia": { "unidade_nativa": "MWmes", "aditividade_temporal": "stock",    "aliases": ["energia armazenada", "mwmes", "estoque"] },
+    "Vazao":          { "unidade_nativa": "m3/s",  "aditividade_temporal": "average",  "aliases": ["vazao", "m3/s"] },
+    "Preco":          { "unidade_nativa": "R$/MWh","aditividade_temporal": "average",  "aliases": ["preco", "custo marginal", "cmo", "pld", "r$/mwh"] }
+  },
+
+  "_fenomenos_doc": "Aliases alinhados aos semantics.measure_terms/family reais dos contratos (auditados em 2026). O gerar_bindings casa measure_terms E family contra estes aliases.",
+  "fenomenos": {
+    "Carga":            { "grandeza": "PotenciaMedia",  "aliases": ["carga", "demanda", "consumo", "demanda maxima"] },
+    "Geracao":          { "grandeza": "PotenciaMedia",  "aliases": ["geracao", "gerou", "gerada", "gerado", "producao", "produziu", "despacho", "despachada", "despachado", "despachadas"] },
+    "Restricao":        { "grandeza": "Energia",        "aliases": ["restricao", "restricoes", "corte", "cortes", "cortada", "curtailment", "constrained off", "constrained-off", "frustrada", "restricao_eolica", "restricao_fotovoltaica"] },
+    "Balanco":          { "grandeza": "PotenciaMedia",  "aliases": ["balanco", "balanco energetico", "matriz", "fonte", "fontes"] },
+    "EnergiaArmazenada":{ "grandeza": "EstoqueEnergia", "aliases": ["ear", "energia armazenada", "armazenada", "armazenamento", "nivel reservatorio"] },
+    "EnergiaNatural":   { "grandeza": "Energia",        "aliases": ["ena", "afluente", "afluencia", "energia natural afluente"] },
+    "CustoMarginal":    { "grandeza": "Preco",          "aliases": ["cmo", "custo marginal", "custo marginal de operacao"] },
+    "CustoVariavel":    { "grandeza": "Preco",          "aliases": ["cvu", "custo variavel", "custo variavel unitario"] },
+    "Capacidade":       { "grandeza": "PotenciaMedia",  "aliases": ["capacidade instalada", "potencia instalada", "instalada", "capacidade", "outorga", "empreendimento", "capacidade_usina"] },
+    "Disponibilidade":  { "grandeza": "PotenciaMedia",  "aliases": ["disponibilidade", "disponivel", "indisponibilidade", "indisponivel"] },
+    "TaxaFalha":        { "grandeza": "PotenciaMedia",  "aliases": ["teif", "teip", "taxa de indisponibilidade", "taxa_teif"] },
+    "FatorCapacidade":  { "grandeza": "PotenciaMedia",  "aliases": ["fator de capacidade", "capacity factor"] },
+    "Intercambio":      { "grandeza": "PotenciaMedia",  "aliases": ["intercambio", "fluxo", "importou", "exportou", "importacao", "exportacao", "importacao_exportacao"] },
+    "Hidrologia":       { "grandeza": "Vazao",          "aliases": ["hidrologico", "hidrologicos", "fluviometrica", "fluviometricas", "vazao", "cota", "nivel", "dados_hidrologicos", "vertida", "turbinavel", "volume de espera", "res_volumeespera", "volumeespera", "reservatorio"] },
+    "Programacao":      { "grandeza": "PotenciaMedia",  "aliases": ["programacao", "programada", "programado", "dessem", "balanco_dessem", "fluxo controlado"] },
+    "Confiabilidade":   { "grandeza": "PotenciaMedia",  "aliases": ["confiabilidade", "confiarb", "robustez", "severidade", "energia nao suprida", "interrupcao", "ind_disponibilidade_ft", "qualidade", "qualid", "providencia"] },
+    "Cadastro":         { "grandeza": "PotenciaMedia",  "aliases": ["cadastro", "linha de transmissao", "linha transmissao", "transmissao", "subestacao", "equipamento", "reativo", "ativo", "inventario"] }
+  },
+  "_fenomenos_sem_binding": "Datasets cujo contrato não traz measure_terms/family suficientes para casar automaticamente (ex.: alguns ind_* e cadastrais) ficam com mede=null. Isso é intencional: C2 degenera em C1 nesses casos e a lacuna é reportada como achado (ver PROTOCOLO §10). Preencher measure_terms no contrato é a correção na fonte.",
+
+  "perspectivas": {
+    "Verificado": ["verificado", "realizado", "medido", "efetivo"],
+    "Programado": ["programado", "programacao", "dessem", "pmo"],
+    "Previsto":   ["previsto", "previsao", "planejado"],
+    "Cadastral":  ["cadastro", "inventario", "quais existem", "lista"]
+  },
+
+  "_dataset_bindings_doc": "Mapa dataset -> {mede, grao, perspectiva}. Chave = nome do contrato (campo 'name'). Preencher a partir de semantics do contrato: measure_terms->fenomeno, row_grain.entity->grao, temporal_perspective->perspectiva. Abaixo um subconjunto curado como semente; o restante é derivável.",
+  "dataset_bindings": {
+    "carga-energia":              { "mede": "Carga",             "grao": "Subsistema",   "perspectiva": "Verificado" },
+    "carga-mensal":               { "mede": "Carga",             "grao": "Subsistema",   "perspectiva": "Verificado" },
+    "curva-carga":                { "mede": "Carga",             "grao": "Subsistema",   "perspectiva": "Verificado" },
+    "balanco-energia-subsistema": { "mede": "Balanco",           "grao": "Subsistema",   "perspectiva": "Verificado" },
+    "ear-diario-por-subsistema":  { "mede": "EnergiaArmazenada", "grao": "Subsistema",   "perspectiva": "Verificado" },
+    "ear-diario-por-reservatorio":{ "mede": "EnergiaArmazenada", "grao": "Reservatorio", "perspectiva": "Verificado" },
+    "ear-diario-por-bacia":       { "mede": "EnergiaArmazenada", "grao": "Bacia",        "perspectiva": "Verificado" },
+    "ena-diario-por-subsistema":  { "mede": "EnergiaNatural",    "grao": "Subsistema",   "perspectiva": "Verificado" },
+    "ena-diario-por-reservatorio":{ "mede": "EnergiaNatural",    "grao": "Reservatorio", "perspectiva": "Verificado" },
+    "ena-diario-por-bacia":       { "mede": "EnergiaNatural",    "grao": "Bacia",        "perspectiva": "Verificado" },
+    "cmo-semi-horario":           { "mede": "CustoMarginal",     "grao": "Submercado",   "perspectiva": "Verificado" },
+    "cmo-semanal":                { "mede": "CustoMarginal",     "grao": "Submercado",   "perspectiva": "Programado" }
+  }
+}

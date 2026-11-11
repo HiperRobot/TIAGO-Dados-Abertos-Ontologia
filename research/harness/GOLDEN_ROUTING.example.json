@@ -1,0 +1,29 @@
+{
+  "_comment": "Gold set de EXEMPLO para o benchmark de roteamento. Cada item: pergunta -> dataset correto (campo 'name' do contrato). Este arquivo é uma SEMENTE de 24 perguntas que ilustra o formato e cobre os pares de confusão conhecidos (carga vs balanço, EAR por subsistema vs reservatório, verificado vs programado, inventário vs série). Para o estudo real, expanda para 300-500 perguntas com anotação independente por 2+ anotadores e meça o acordo (Cohen's kappa). NÃO reutilize perguntas de calibração no conjunto de teste.",
+  "itens": [
+    { "pergunta": "Qual foi a carga de energia do Sudeste em agosto de 2020?", "esperado": "carga-energia", "categoria": "simples_subsistema" },
+    { "pergunta": "Como evoluiu a demanda de energia no Nordeste nos últimos 5 anos?", "esperado": "carga-energia", "categoria": "serie_temporal" },
+    { "pergunta": "Qual a carga do SIN agora?", "esperado": "carga-energia", "categoria": "coloquial" },
+    { "pergunta": "Qual foi o balanço de energia do subsistema Sul em 2021?", "esperado": "balanco-energia-subsistema", "categoria": "confusao_carga_balanco" },
+    { "pergunta": "Mostre o balanço energético por subsistema em janeiro de 2022", "esperado": "balanco-energia-subsistema", "categoria": "confusao_carga_balanco" },
+    { "pergunta": "Qual era a energia armazenada por subsistema em agosto de 2020?", "esperado": "ear-diario-por-subsistema", "categoria": "estoque_subsistema" },
+    { "pergunta": "Qual o nível de energia armazenada por reservatório em 2023?", "esperado": "ear-diario-por-reservatorio", "categoria": "confusao_grao_ear" },
+    { "pergunta": "Energia armazenada por bacia hidrográfica em 2024", "esperado": "ear-diario-por-bacia", "categoria": "confusao_grao_ear" },
+    { "pergunta": "Qual a energia natural afluente por subsistema em maio de 2022?", "esperado": "ena-diario-por-subsistema", "categoria": "ena_subsistema" },
+    { "pergunta": "ENA por reservatório no último ano", "esperado": "ena-diario-por-reservatorio", "categoria": "confusao_grao_ena" },
+    { "pergunta": "Qual foi o CMO semi-horário do Sudeste ontem?", "esperado": "cmo-semi-horario", "categoria": "preco_verificado" },
+    { "pergunta": "Qual o custo marginal de operação semanal programado?", "esperado": "cmo-semanal", "categoria": "preco_programado" },
+    { "pergunta": "Qual a carga prevista para amanhã no SE?", "esperado": "balanco_dessem_geral", "categoria": "confusao_perspectiva" },
+    { "pergunta": "Geração de energia por subsistema em 2025", "esperado": "geracao-exportacao-internacional", "categoria": "confusao_perspectiva_verificado" },
+    { "pergunta": "Quais usinas de geração existem no cadastro?", "esperado": "capacidade-geracao", "categoria": "inventario" },
+    { "pergunta": "Qual a capacidade instalada de transformação?", "esperado": "capacidade-transformacao", "categoria": "cadastro" },
+    { "pergunta": "Qual o CVU das usinas termelétricas?", "esperado": "cvu-usitermica", "categoria": "medida_especifica" },
+    { "pergunta": "Dados hidrológicos dos reservatórios em 2023", "esperado": "dados-hidrologicos-res", "categoria": "hidrologia" },
+    { "pergunta": "Qual a demanda máxima diária registrada?", "esperado": "demanda_maxima_di", "categoria": "pico" },
+    { "pergunta": "Disponibilidade das usinas em 2024", "esperado": "disponibilidade_usina", "categoria": "indicador_vs_cadastro" },
+    { "pergunta": "Energia vertida turbinável por usina", "esperado": "energia-vertida-turbinavel", "categoria": "medida_especifica" },
+    { "pergunta": "Fator de capacidade das usinas eólicas", "esperado": "fator-capacidade-2", "categoria": "medida_especifica" },
+    { "pergunta": "Qual a carga mensal de energia do Norte em 2023?", "esperado": "carga-mensal", "categoria": "confusao_grao_carga" },
+    { "pergunta": "Curva de carga horária do SIN", "esperado": "curva-carga", "categoria": "confusao_grao_carga" }
+  ]
+}

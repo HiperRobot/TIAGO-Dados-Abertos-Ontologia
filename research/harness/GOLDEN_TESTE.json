@@ -1,0 +1,634 @@
+{
+  "itens": [
+    {
+      "pergunta": "qual a geração hidráulica média do subsistema Sudeste/Centro-Oeste em janeiro de 2024?",
+      "esperado": "balanco-energia-subsistema",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como evoluiu a participação da geração eólica no Nordeste entre 2010 e 2024?",
+      "esperado": "balanco-energia-subsistema",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual subsistema foi o maior exportador líquido no verão de 2023?",
+      "esperado": "balanco-energia-subsistema",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual a carga máxima verificada no SIN em 2024 e em qual hora ocorreu?",
+      "esperado": "balanco-energia-subsistema",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a geração eólica programada pelo DESSEM no NE no dia 2025-06-01 por patamar?",
+      "esperado": "balanco_dessem_detalhe",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "Como se distribui a geração fotovoltaica durante do dia no SE segundo o DESSEM?",
+      "esperado": "balanco_dessem_detalhe",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Qual o patamar de maior demanda programada pelo DESSEM no SE em um dia típico?",
+      "esperado": "balanco_dessem_detalhe",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "qual a geração hidráulica programada pelo DESSEM para o subsistema SE no dia 2025-06-01?",
+      "esperado": "balanco_dessem_geral",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "Em quais patamares do dia a demanda programada é mais elevada no NE?",
+      "esperado": "balanco_dessem_geral",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual a capacidade instalada total de geração hidrelétrica no Sudeste/Centro-Oeste?",
+      "esperado": "capacidade-geracao",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a capacidade total de transformação instalada por subsistema no SIN?",
+      "esperado": "capacidade-transformacao",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual a carga do subsistema Sudeste em janeiro de 2024?",
+      "esperado": "carga-energia",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como evoluiu a demanda no Nordeste nos últimos 5 anos?",
+      "esperado": "carga-energia",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual subsistema teve maior crescimento de carga entre 2015 e 2025?",
+      "esperado": "carga-energia",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o pico de carga do SIN em 2023 e em qual data ocorreu?",
+      "esperado": "carga-energia",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual a evolução da carga do subsistema Sudeste/Centro-Oeste nos últimos 5 anos?",
+      "esperado": "carga-mensal",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual subsistema teve maior crescimento de carga entre 2010 e 2024?",
+      "esperado": "carga-mensal",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "Como a carga do SIN variou sazonalmente durante dos anos?",
+      "esperado": "carga-mensal",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a demanda máxima de Roraima em 2024 e em qual horário ocorreu?",
+      "esperado": "cargaglobal-roraima",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o fator de carga médio de Roraima por mês?",
+      "esperado": "cargaglobal-roraima",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o total vertida turbinável verificada no SIN em 2024?",
+      "esperado": "classificacao-evt",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o pico horário de EVT verificado no período 2024-2025 e quando ocorreu?",
+      "esperado": "classificacao-evt",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o CMO médio semanal do subsistema Sudeste no último trimestre?",
+      "esperado": "cmo-semanal",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como o CMO variou entre os patamares leve, média e pesada no Sul em 2023?",
+      "esperado": "cmo-semanal",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual subsistema teve o maior CMO médio semanal nos últimos 12 meses?",
+      "esperado": "cmo-semanal",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o CMO médio do subsistema Sudeste/Centro-Oeste em janeiro de 2024?",
+      "esperado": "cmo-semi-horario",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como o CMO variou durante do dia (perfil intra-diário) para cada subsistema em 2023?",
+      "esperado": "cmo-semi-horario",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual subsistema teve o maior CMO médio em estiagem de 2021?",
+      "esperado": "cmo-semi-horario",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual a carga máxima do subsistema Sudeste/Centro-Oeste em 2024?",
+      "esperado": "curva-carga",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Qual subsistema teve maior crescimento de carga entre 2010 e 2024?",
+      "esperado": "curva-carga",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o perfil típico de carga horária do subsistema Sul em dias úteis de janeiro?",
+      "esperado": "curva-carga",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como evoluiu o CVU médio das térmicas a gás natural durante dos anos?",
+      "esperado": "cvu-usitermica",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o volume útil médio dos reservatórios do subsistema Sudeste/Centro-Oeste no último mês?",
+      "esperado": "dados-hidrologicos-res",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Como evoluiu a vazão afluente de Itaipu durante de 2024?",
+      "esperado": "dados-hidrologicos-res",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o volume útil médio dos reservatórios do subsistema Sudeste/Centro-Oeste na última semana?",
+      "esperado": "dados_hidrologicos_ho",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a demanda máxima instantânea do subsistema Sudeste/Centro-Oeste em janeiro de 2025?",
+      "esperado": "demanda_maxima_di",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Qual subsistema teve maior crescimento de demanda máxima entre 2024 e 2025?",
+      "esperado": "demanda_maxima_di",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "Qual o horário típico de pico de demanda instantânea no Nordeste?",
+      "esperado": "demanda_maxima_di",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual a disponibilidade operacional média das usinas hidráulicas do subsistema Sudeste em janeiro de 2024?",
+      "esperado": "disponibilidade_usina",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual o percentual de armazenamento atual de cada bacia hidro energética?",
+      "esperado": "ear-diario-por-bacia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Qual bacia teve maior variação de EAR percentual no último trimestre?",
+      "esperado": "ear-diario-por-bacia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual o percentual de armazenamento atual do reservatório equivalente SUDESTE?",
+      "esperado": "ear-diario-por-ree-reservatorio-equivalente-de-energia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual o menor nível de armazenamento histórico do REE SUL e quando ocorreu?",
+      "esperado": "ear-diario-por-ree-reservatorio-equivalente-de-energia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual o percentual de armazenamento do reservatório de Furnas nos últimos 30 dias?",
+      "esperado": "ear-diario-por-reservatorio",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual o nível atual armazenada nos reservatórios do subsistema Sudeste?",
+      "esperado": "ear-diario-por-subsistema",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Qual subsistema teve menor energia armazenada em MWmês no verão de 2021?",
+      "esperado": "ear-diario-por-subsistema",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual a ENA bruta da bacia do Paraná nos últimos 30 dias?",
+      "esperado": "ena-diario-por-bacia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Qual a média histórica de ENA bruta por bacia em chuvas (novembro a março)?",
+      "esperado": "ena-diario-por-bacia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual a ENA bruta do subsistema Sudeste/Centro-Oeste nos últimos 30 dias?",
+      "esperado": "ena-diario-por-ree-reservatorio-equivalente-de-energia",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual REE teve maior variação percentual de ENA bruta em relação à MLT no ano de 2022?",
+      "esperado": "ena-diario-por-ree-reservatorio-equivalente-de-energia",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual a ENA bruta diária do reservatório de Furnas em janeiro de 2024?",
+      "esperado": "ena-diario-por-reservatorio",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Como evoluiu a ENA armazenável do REE Paraná Médio durante de 2023?",
+      "esperado": "ena-diario-por-reservatorio",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual a participação percentual de cada reservatório na ENA total do subsistema Sul?",
+      "esperado": "ena-diario-por-reservatorio",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual a ENA Bruta do subsistema Sudeste nos últimos 30 dias?",
+      "esperado": "ena-diario-por-subsistema",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Como evoluiu a ENA Armazenável do subsistema Sul durante de 2023?",
+      "esperado": "ena-diario-por-subsistema",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a perda acumulada de geração por vertimento turbinável no Sudeste em 2023?",
+      "esperado": "energia-vertida-turbinavel",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual a capacidade total de reativos instalada por subsistema elétrico?",
+      "esperado": "equipamento-controle-reativo",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual o fator de capacidade médio das usinas eólicas do Nordeste em janeiro de 2022?",
+      "esperado": "fator-capacidade-2",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como varia o fator de capacidade horário das usinas eólicas durante do dia?",
+      "esperado": "fator-capacidade-2",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o volume total exportada para Argentina e Uruguai em 2024?",
+      "esperado": "geracao-exportacao-internacional",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a geração térmica total programada e verificada por subsistema em 2023?",
+      "esperado": "geracao-termica-despacho-2",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual a geração total hidráulica no Sudeste em janeiro de 2024?",
+      "esperado": "geracao-usina-2",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Como evoluiu a participação solar na matriz de geração do SIN entre 2020 e 2024?",
+      "esperado": "geracao-usina-2",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o fator de capacidade médio de Itaipu nos últimos 12 meses?",
+      "esperado": "geracao-usina-2",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a geração média horária de Itaipu destinada ao Brasil em 2023?",
+      "esperado": "geracao_itaipu",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a geração máxima registrada de Itaipu e em que data ocorreu?",
+      "esperado": "geracao_itaipu",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a vazão média diária na bacia do Paraná nos últimos 30 dias?",
+      "esperado": "grandezas_fluviometricas",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Como evoluiu a vazão média no rio Paraná durante de 2023 e 2024?",
+      "esperado": "grandezas_fluviometricas",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o volume total importada da Argentina em 2023, por mês?",
+      "esperado": "importacaoenergia-comercial-2",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a diferença média entre importação programada e despachada por país exportador?",
+      "esperado": "importacaoenergia-comercial-2",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a disponibilidade média das funções geração do SIN em 2024?",
+      "esperado": "ind-disponibilidade-geracao-sin",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Como evoluiu a indisponibilidade programada do parque gerador nacional durante de 2023?",
+      "esperado": "ind-disponibilidade-geracao-sin",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a evolução mensal do ATLS para o fluxo Itaipu 500 kV nos últimos 3 anos?",
+      "esperado": "ind_confiarb_atls",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o ranking dos fluxos com pior desempenho de atendimento aos limites sistêmicos no período anual de 2024?",
+      "esperado": "ind_confiarb_atls",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o valor do indicador CCAL do SIN nos últimos 12 meses?",
+      "esperado": "ind_confiarb_ccal",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o CCAT médio por agente de transmissão em 2024?",
+      "esperado": "ind_confiarb_ccat",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a evolução do CIPER no Sudeste/Centro-Oeste nos últimos 5 anos?",
+      "esperado": "ind_confiarb_ciper",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a evolução do DREQ do subsistema Sudeste/Centro-Oeste nos últimos 5 anos?",
+      "esperado": "ind_confiarb_dreq_freq",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a energia não suprida total do SIN em 2023?",
+      "esperado": "ind_confiarb_energianaosuprida",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Em quais meses ocorreram os maiores eventos não suprida na Rede Básica?",
+      "esperado": "ind_confiarb_energianaosuprida",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual a evolução do indicador RRB para o subsistema Sudeste/Centro-Oeste nos últimos 12 meses?",
+      "esperado": "ind_confiarb_robustez",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a evolução mensal do indicador de severidade SM1 para o subsistema Sudeste/Centro-Oeste nos últimos 5 anos?",
+      "esperado": "ind_confiarb_severidade",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a disponibilidade média das usinas hidrelétricas no Sudeste em 2023?",
+      "esperado": "ind_disponibilidade_fgeracao_uge_anual",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Qual agente proprietário teve pior desempenho de disponibilidade em 2022?",
+      "esperado": "ind_disponibilidade_fgeracao_uge_anual",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a disponibilidade média dos conversores de transmissão em 2024?",
+      "esperado": "ind_disponibilidade_ft_conversor",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Como evoluiu o indicador DISPFTConv durante dos meses de 2023 a 2026?",
+      "esperado": "ind_disponibilidade_ft_conversor",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual a disponibilidade média dos equipamentos de controle de reativo por característica nos últimos 12 meses?",
+      "esperado": "ind_disponibilidade_ft_reativo",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Como evoluiu o indicador DISP dos equipamentos reativos de 500 kV durante do tempo?",
+      "esperado": "ind_disponibilidade_ft_reativo",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o ECPA médio do SIN nos últimos 12 meses?",
+      "esperado": "ind_providencia_ecpa_pcpa",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "qual o valor do indicador DFD para cada faixa de frequência no último mês disponível?",
+      "esperado": "ind_qualid_dfd_meano",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Como evoluiu o DFD anual durante dos anos para a faixa de frequência mais crítica?",
+      "esperado": "ind_qualid_dfd_meano",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o valor médio do DFP no ano de 2023?",
+      "esperado": "ind_qualid_dfp_regime",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o intercâmbio médio entre o Brasil e a Argentina em 2024?",
+      "esperado": "intercambio-internacional",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "O Brasil foi importador ou exportador líquido para o Uruguai no último ano?",
+      "esperado": "intercambio-internacional",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Quais foram os horários de pico de exportação para o Paraguai?",
+      "esperado": "intercambio-internacional",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual o desvio entre o intercâmbio programado e o realizado com a Argentina?",
+      "esperado": "intercambio-internacional",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o intercâmbio médio do subsistema Sudeste para o Nordeste em 2024?",
+      "esperado": "intercambio-nacional",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Qual subsistema foi o maior exportador líquido no primeiro trimestre de 2025?",
+      "esperado": "intercambio-nacional",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "qual o volume de intercâmbio contratual pela conversora de Uruguaiana em janeiro de 2024?",
+      "esperado": "intercambio_modalidade",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o desvio médio entre o intercâmbio programado e verificado por modalidade e conversora?",
+      "esperado": "intercambio_modalidade",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a energia não suprida total por subsistema em 2023?",
+      "esperado": "interrupcao_carga",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Quais são as linhas de transmissão de 500 kV da CHESF no Nordeste?",
+      "esperado": "linha-transmissao",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "Quais agentes declararam ofertas de preço para importação da Argentina na última semana?",
+      "esperado": "ofertapreco-importacao",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual o preço médio de oferta de importação por país (Argentina vs Uruguai) durante do tempo?",
+      "esperado": "ofertapreco-importacao",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual a geração programada total por subsistema no dia 2025-01-15 em cada patamar semi-horário?",
+      "esperado": "programacao_diaria",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual o fluxo programado na linha de transmissão X no patamar de pico do dia Y?",
+      "esperado": "programacao_fluxo_controlado",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "Como evoluiu o fluxo programado no terminal de origem de um elemento controlado durante de um dia típico?",
+      "esperado": "programacao_fluxo_controlado",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "qual o desvio médio entre previsão e programado para usinas eólicas em determinado dia?",
+      "esperado": "programacao_x_previsao",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "Como evoluiu a aderência entre previsão e programado durante dos patamares do dia?",
+      "esperado": "programacao_x_previsao",
+      "categoria": "perspectiva_futura"
+    },
+    {
+      "pergunta": "qual a soma da geração prevista versus programada por patamar para uma data específica?",
+      "esperado": "programacao_x_previsao",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "qual o histórico do volume de espera recomendado para a usina de Itaipu nos últimos 12 meses?",
+      "esperado": "res_volumeespera",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Quais são os reservatórios com maior volume útil total no Sudeste/Centro-Oeste?",
+      "esperado": "reservatorio",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual a energia curtailed (não gerada por restrição) das usinas eólicas do subsistema NE em janeiro de 2024?",
+      "esperado": "restricao_coff_eolica_detail",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "Em quais períodos do dia ocorre maior concentração de constrained-off eólico no Nordeste?",
+      "esperado": "restricao_coff_eolica_detail",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual a energia não gerada por constrained-off na usina EOL VENTOS DE SANTA EUGENIA em janeiro de 2024?",
+      "esperado": "restricao_coff_eolica_usi",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "qual o volume total cortada por constrained-off em usinas fotovoltaicas do Nordeste em 2025?",
+      "esperado": "restricao_coff_fotovoltaica",
+      "categoria": "simples_subsistema"
+    },
+    {
+      "pergunta": "qual o curtailment total (MWh) por usina fotovoltaica no mês de janeiro de 2025?",
+      "esperado": "restricao_coff_fotovoltaica_detail",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Quais subestações de 500 kV existem no Nordeste?",
+      "esperado": "subestacao",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual a distribuição de subestações por nível de tensão no SIN?",
+      "esperado": "subestacao",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Como evoluiu a taxa de indisponibilidade programada (TEIP) da usina Angra 1 durante dos últimos 5 anos?",
+      "esperado": "taxa_teif_teip",
+      "categoria": "confusao_grao"
+    },
+    {
+      "pergunta": "Qual a evolução mensal da TEIP_Oper das usinas hidrelétricas no Sudeste?",
+      "esperado": "taxa_teif_teip_oper",
+      "categoria": "serie_temporal"
+    },
+    {
+      "pergunta": "Qual unidade geradora teve maior número de horas indisponíveis forçadas em 2023?",
+      "esperado": "taxa_teif_teip_parametro",
+      "categoria": "ranking"
+    },
+    {
+      "pergunta": "Como evoluíram os parâmetros de horas disponíveis das usinas hidrelétricas durante de 2022?",
+      "esperado": "taxa_teif_teip_parametro",
+      "categoria": "outro"
+    },
+    {
+      "pergunta": "Quantas usinas Tipo II-C estão ativas no Nordeste?",
+      "esperado": "usina_conjunto",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual o histórico de composição do conjunto Y — quais usinas entraram e saíram?",
+      "esperado": "usina_conjunto",
+      "categoria": "inventario"
+    },
+    {
+      "pergunta": "qual o CEG ANEEL da usina Y que pertence ao GPQ Z?",
+      "esperado": "usina_pqu",
+      "categoria": "confusao_grao"
+    }
+  ]
+}

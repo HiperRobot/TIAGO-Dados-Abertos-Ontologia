@@ -1,0 +1,53 @@
+{
+  "_comment": "Gold set de EXEMPLO para o experimento de unidade/aditividade. Cada item: um SQL, as colunas do resultado e o gabarito (unidade + aditividade) SÓ das colunas-medida. Inclui de propósito casos ADVERSARIAIS onde o nome da coluna NÃO entrega a unidade (nome neutro) ou MENTE (estoque agregado com SUM), para separar U0 (heurística de nome) de U1 (contrato). Expandir e revisar à mão para o estudo real. 'fonte_sql' registra a proveniência.",
+  "itens": [
+    {
+      "id": "carga_mwmed_avg",
+      "sql": "SELECT id_subsistema, AVG(TRY_CAST(val_cargaenergiamwmed AS DOUBLE)) AS carga_mwmed FROM read_parquet('s3://ons-aws-prod-opendata/dataset/carga_energia_di/*.parquet') GROUP BY id_subsistema",
+      "colunas": ["id_subsistema", "carga_mwmed"],
+      "esperado": {"carga_mwmed": {"unit": "MWmed", "additive": false}},
+      "fonte_sql": "sql_pattern",
+      "nota": "potencia media; nome entrega a unidade (U0 tende a acertar)"
+    },
+    {
+      "id": "carga_nome_neutro",
+      "sql": "SELECT id_subsistema, AVG(TRY_CAST(val_cargaenergiamwmed AS DOUBLE)) AS valor FROM read_parquet('s3://ons-aws-prod-opendata/dataset/carga_energia_di/*.parquet') GROUP BY id_subsistema",
+      "colunas": ["id_subsistema", "valor"],
+      "esperado": {"valor": {"unit": "MWmed", "additive": false}},
+      "fonte_sql": "adversarial",
+      "nota": "MESMA metrica, alias NEUTRO 'valor': U0 nao tem pista, U1 prova pelo contrato"
+    },
+    {
+      "id": "energia_gwh_sum",
+      "sql": "SELECT id_subsistema, SUM(TRY_CAST(val_cargaenergiamwmed AS DOUBLE)*24.0)/1000 AS energia_gwh FROM read_parquet('s3://ons-aws-prod-opendata/dataset/carga_energia_di/*.parquet') GROUP BY id_subsistema",
+      "colunas": ["id_subsistema", "energia_gwh"],
+      "esperado": {"energia_gwh": {"unit": "GWh", "additive": true}},
+      "fonte_sql": "sql_pattern",
+      "nota": "potencia media vira energia pelo intervalo no SQL; aditiva"
+    },
+    {
+      "id": "ear_estoque_sum_enganoso",
+      "sql": "SELECT nom_subsistema, SUM(TRY_CAST(ear_verif_subsistema_mwmes AS DOUBLE)) AS total FROM read_parquet('s3://ons-aws-prod-opendata/dataset/ear_subsistema_di/*.parquet') GROUP BY nom_subsistema",
+      "colunas": ["nom_subsistema", "total"],
+      "esperado": {"total": {"unit": "MWmes", "additive": false}},
+      "fonte_sql": "adversarial",
+      "nota": "CASO CRITICO: estoque (EAR) com SUM e alias 'total'. U0 cravaria additive=true (ERRADO e perigoso); U1 sabe que estoque nao soma no tempo"
+    },
+    {
+      "id": "ear_media_subsistema",
+      "sql": "SELECT nom_subsistema, ROUND(AVG(TRY_CAST(ear_verif_subsistema_mwmes AS DOUBLE)),0) AS ear_mwmes FROM read_parquet('s3://ons-aws-prod-opendata/dataset/ear_subsistema_di/*.parquet') GROUP BY nom_subsistema",
+      "colunas": ["nom_subsistema", "ear_mwmes"],
+      "esperado": {"ear_mwmes": {"unit": "MWmes", "additive": false}},
+      "fonte_sql": "fewshot",
+      "nota": "energia armazenada (estoque), nao aditiva"
+    },
+    {
+      "id": "contagem_dias",
+      "sql": "SELECT id_subsistema, COUNT(*) AS qtd_dias FROM read_parquet('s3://ons-aws-prod-opendata/dataset/carga_energia_di/*.parquet') GROUP BY id_subsistema",
+      "colunas": ["id_subsistema", "qtd_dias"],
+      "esperado": {"qtd_dias": {"unit": null, "additive": true}},
+      "fonte_sql": "adversarial",
+      "nota": "COUNT nao tem unidade fisica; e aditivo. U0 nao tem regra p/ COUNT"
+    }
+  ]
+}

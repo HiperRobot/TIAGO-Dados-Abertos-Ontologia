@@ -1,0 +1,254 @@
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix ons:  <https://dados.ons.org.br/ontologia#> .
+
+#################################################################
+#  Ontologia mínima do domínio ONS (setor elétrico brasileiro)
+#
+#  Objetivo de pesquisa: fornecer a camada C2 (data contracts +
+#  ontologia) do experimento. Modela o que os data contracts ODCS
+#  isolados NÃO expressam: relações entre entidades espaciais,
+#  taxonomia de grandezas/unidades e distinção de perspectiva
+#  temporal. É deliberadamente MÍNIMA — cobre só o que o roteamento
+#  e a validação cross-dataset precisam, não o setor elétrico inteiro.
+#
+#  Fontes de verdade do conteúdo: os próprios contratos em
+#  contracts/ons/*.odcs.yaml (enums de subsistema, measure_terms,
+#  temporal_perspective, units). A ontologia RELACIONA o que lá está
+#  disperso por 78 arquivos sem vínculo entre si.
+#################################################################
+
+ons: a owl:Ontology ;
+    rdfs:label "Ontologia do domínio ONS — dados abertos do setor elétrico"@pt ;
+    owl:versionInfo "0.1.0-research" .
+
+#################################################################
+#  1. ENTIDADES ESPACIAIS  (hierarquia de agregação)
+#################################################################
+
+ons:EntidadeEspacial a owl:Class ;
+    rdfs:label "Entidade espacial"@pt ;
+    skos:definition "Qualquer recorte geográfico/elétrico pelo qual um dado é agregado."@pt .
+
+ons:SIN a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Sistema Interligado Nacional"@pt ;
+    skos:altLabel "SIN"@pt ;
+    skos:definition "Agregado nacional. É a SOMA dos quatro subsistemas no mesmo instante."@pt .
+
+ons:Subsistema a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Subsistema"@pt ;
+    skos:altLabel "subsistema elétrico"@pt, "região elétrica"@pt .
+
+ons:Submercado a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Submercado"@pt ;
+    skos:definition "Recorte de mercado (CMO/PLD). Alinha-se aos subsistemas, mas é um eixo distinto."@pt .
+
+ons:REE a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Reservatório Equivalente de Energia"@pt ;
+    skos:altLabel "REE"@pt .
+
+ons:Bacia a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Bacia hidrográfica"@pt .
+
+ons:Reservatorio a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Reservatório"@pt .
+
+ons:Usina a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Usina"@pt ;
+    skos:altLabel "planta"@pt, "empreendimento de geração"@pt .
+
+ons:Subestacao a owl:Class ;
+    rdfs:subClassOf ons:EntidadeEspacial ;
+    rdfs:label "Subestação"@pt .
+
+# ── Relação de agregação espacial (transitiva) ──────────────────
+# "parteDe" diz que o dado de A rola para B. É o que permite responder
+# "usinas da bacia X que alimentam o subsistema Y" cruzando datasets.
+ons:parteDe a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:label "parte de"@pt ;
+    rdfs:domain ons:EntidadeEspacial ;
+    rdfs:range ons:EntidadeEspacial ;
+    skos:definition "A agrega em B: somar/avaliar A compõe B. Transitiva."@pt .
+
+ons:Subsistema  ons:parteDe  ons:SIN .
+ons:REE         ons:parteDe  ons:Subsistema .
+ons:Reservatorio ons:parteDe ons:REE .
+ons:Usina       ons:parteDe  ons:Reservatorio .
+ons:Bacia       ons:parteDe  ons:Subsistema .
+
+# Instâncias dos subsistemas (os enums que aparecem em dezenas de contratos)
+ons:SE a ons:Subsistema ; skos:prefLabel "Sudeste/Centro-Oeste"@pt ;
+    skos:altLabel "SE"@pt, "sudeste"@pt, "centro-oeste"@pt, "se/co"@pt ; ons:parteDe ons:SIN .
+ons:S  a ons:Subsistema ; skos:prefLabel "Sul"@pt ;
+    skos:altLabel "S"@pt, "sul"@pt ; ons:parteDe ons:SIN .
+ons:NE a ons:Subsistema ; skos:prefLabel "Nordeste"@pt ;
+    skos:altLabel "NE"@pt, "nordeste"@pt ; ons:parteDe ons:SIN .
+ons:N  a ons:Subsistema ; skos:prefLabel "Norte"@pt ;
+    skos:altLabel "N"@pt, "norte"@pt ; ons:parteDe ons:SIN .
+
+#################################################################
+#  2. GRANDEZAS E UNIDADES  (taxonomia de aditividade)
+#
+#  O erro que a ontologia previne: tratar potência média (MWmed),
+#  energia (MWh/GWh) e estoque de energia (MWmês) como somáveis do
+#  mesmo jeito. Cada QuantityKind declara a aditividade temporal.
+#################################################################
+
+ons:QuantityKind a owl:Class ;
+    rdfs:label "Tipo de grandeza"@pt .
+
+ons:Unidade a owl:Class ;
+    rdfs:subClassOf qudt:Unit ;
+    rdfs:label "Unidade de medida"@pt .
+
+ons:temUnidadeNativa a owl:ObjectProperty ;
+    rdfs:domain ons:QuantityKind ; rdfs:range ons:Unidade .
+
+# aditividadeTemporal: pode somar ao longo do tempo?
+#   additive  = soma faz sentido (energia)
+#   average   = é média/potência; somar no tempo é erro, agrega-se por AVG
+#   stock     = é foto/estoque; somar no tempo conta a mesma coisa 2x
+ons:aditividadeTemporal a owl:DatatypeProperty ;
+    rdfs:domain ons:QuantityKind ; rdfs:range rdfs:Literal .
+
+ons:PotenciaMedia a ons:QuantityKind ;
+    rdfs:label "Potência média"@pt ;
+    skos:altLabel "average_power"@pt ;
+    ons:aditividadeTemporal "average" ;
+    ons:temUnidadeNativa ons:MWmed .
+
+ons:Energia a ons:QuantityKind ;
+    rdfs:label "Energia"@pt ;
+    ons:aditividadeTemporal "additive" ;
+    ons:temUnidadeNativa ons:MWh .
+
+ons:EstoqueEnergia a ons:QuantityKind ;
+    rdfs:label "Energia armazenada (estoque)"@pt ;
+    skos:altLabel "energy_stock"@pt ;
+    ons:aditividadeTemporal "stock" ;
+    ons:temUnidadeNativa ons:MWmes .
+
+ons:Vazao a ons:QuantityKind ;
+    rdfs:label "Vazão"@pt ;
+    ons:aditividadeTemporal "average" ;
+    ons:temUnidadeNativa ons:m3s .
+
+ons:Preco a ons:QuantityKind ;
+    rdfs:label "Preço / custo marginal"@pt ;
+    skos:altLabel "CMO"@pt, "PLD"@pt ;
+    ons:aditividadeTemporal "average" ;
+    ons:temUnidadeNativa ons:RSMWh .
+
+ons:MWmed a ons:Unidade ; rdfs:label "MWmed"@pt ; skos:definition "Megawatt médio."@pt .
+ons:MWh   a ons:Unidade ; rdfs:label "MWh"@pt .
+ons:GWh   a ons:Unidade ; rdfs:label "GWh"@pt .
+ons:MWmes a ons:Unidade ; rdfs:label "MWmês"@pt ; skos:definition "Energia armazenada equivalente."@pt .
+ons:m3s   a ons:Unidade ; rdfs:label "m³/s"@pt .
+ons:RSMWh a ons:Unidade ; rdfs:label "R$/MWh"@pt .
+
+#################################################################
+#  3. FENÔMENOS / MEDIDAS  (o que o dado descreve)
+#
+#  Separa medidas que compartilham ativo mas são coisas distintas:
+#  carga ≠ geração ≠ balanço; geração ≠ corte (curtailment).
+#################################################################
+
+ons:Fenomeno a owl:Class ; rdfs:label "Fenômeno medido"@pt .
+
+ons:temGrandeza a owl:ObjectProperty ;
+    rdfs:domain ons:Fenomeno ; rdfs:range ons:QuantityKind .
+
+ons:Carga a ons:Fenomeno ;
+    rdfs:label "Carga / demanda"@pt ;
+    skos:altLabel "consumo"@pt, "demanda"@pt, "carga"@pt ;
+    ons:temGrandeza ons:PotenciaMedia .
+
+ons:Geracao a ons:Fenomeno ;
+    rdfs:label "Geração"@pt ;
+    skos:altLabel "produção"@pt, "despacho"@pt ;
+    ons:temGrandeza ons:PotenciaMedia .
+
+ons:Corte a ons:Fenomeno ;
+    rdfs:label "Corte de geração (curtailment)"@pt ;
+    skos:altLabel "curtailment"@pt, "constrained-off"@pt ;
+    ons:temGrandeza ons:Energia .
+
+ons:Balanco a ons:Fenomeno ;
+    rdfs:label "Balanço de energia"@pt ;
+    skos:altLabel "balanço"@pt ;
+    ons:temGrandeza ons:PotenciaMedia .
+
+ons:EnergiaArmazenada a ons:Fenomeno ;
+    rdfs:label "Energia armazenada (EAR)"@pt ;
+    skos:altLabel "EAR"@pt, "reservatório"@pt ;
+    ons:temGrandeza ons:EstoqueEnergia .
+
+ons:EnergiaNatural a ons:Fenomeno ;
+    rdfs:label "Energia natural afluente (ENA)"@pt ;
+    skos:altLabel "ENA"@pt, "afluência"@pt ;
+    ons:temGrandeza ons:Energia .
+
+ons:CustoMarginal a ons:Fenomeno ;
+    rdfs:label "Custo marginal de operação"@pt ;
+    skos:altLabel "CMO"@pt ;
+    ons:temGrandeza ons:Preco .
+
+#################################################################
+#  4. PERSPECTIVA TEMPORAL  (verificado × programado × previsto)
+#
+#  Espelha semantics.temporal_perspective dos contratos, mas como
+#  classe de 1a ordem: deixa o roteamento raciocinar sobre o eixo
+#  em vez de casar palavra.
+#################################################################
+
+ons:PerspectivaTemporal a owl:Class ; rdfs:label "Perspectiva temporal"@pt .
+
+ons:Verificado a ons:PerspectivaTemporal ;
+    rdfs:label "Verificado"@pt ;
+    skos:altLabel "realizado"@pt, "medido"@pt, "efetivo"@pt .
+
+ons:Programado a ons:PerspectivaTemporal ;
+    rdfs:label "Programado"@pt ;
+    skos:altLabel "despacho programado"@pt, "DESSEM"@pt, "PMO"@pt .
+
+ons:Previsto a ons:PerspectivaTemporal ;
+    rdfs:label "Previsto"@pt ;
+    skos:altLabel "previsão"@pt, "planejado"@pt .
+
+ons:Cadastral a ons:PerspectivaTemporal ;
+    rdfs:label "Cadastral"@pt ;
+    skos:definition "Inventário/estrutura; sem eixo temporal de apuração."@pt .
+
+#################################################################
+#  5. PONTE PARA OS CONTRATOS
+#
+#  Liga um dataset (contrato ODCS) ao fenômeno, à entidade de grão
+#  e à perspectiva. É o join que o roteamento C2 usa.
+#################################################################
+
+ons:Dataset a owl:Class ; rdfs:label "Dataset (contrato ODCS)"@pt .
+
+ons:mede a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:Fenomeno .
+ons:temGrao a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:EntidadeEspacial .
+ons:temPerspectiva a owl:ObjectProperty ; rdfs:domain ons:Dataset ; rdfs:range ons:PerspectivaTemporal .
+
+# Exemplo de ancoragem (os demais 77 ficam no mapeamento JSON operacional):
+ons:carga-energia a ons:Dataset ;
+    ons:mede ons:Carga ;
+    ons:temGrao ons:Subsistema ;
+    ons:temPerspectiva ons:Verificado .
+
+ons:ear-diario-por-subsistema a ons:Dataset ;
+    ons:mede ons:EnergiaArmazenada ;
+    ons:temGrao ons:Subsistema ;
+    ons:temPerspectiva ons:Verificado .

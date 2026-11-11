@@ -1,0 +1,10 @@
+# Snapshot de pesquisa (TCC): gold sets, pesos calibrados e saídas de rodada
+# SÃO versionados de propósito — são evidência do estudo de caso.
+# (O .gitignore original excluía GOLDEN_*.json, gold_candidatos.jsonl,
+#  pesos_boost.json e rodada*.json.)
+__pycache__/
+*.pyc
+
+# scripts de smoke temporários
+_smoke*.py
+_saida*.txt
