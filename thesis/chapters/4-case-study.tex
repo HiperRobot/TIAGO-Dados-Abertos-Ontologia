@@ -41,7 +41,7 @@ item 5 of the manual.}
 \textbf{Contracts and ontology.} The ontology was built twice. A first, exploratory attempt
 with an AI coding assistant produced a small ontology with hand-curated aliases. It is kept
 as a tagged snapshot and is not used in the results. The second attempt, reported here,
-separates a hand-written schema (T-Box, 165 lines of Turtle) from generated content (A-Box).
+separates a hand-written schema (T-Box, 168 lines of Turtle) from generated content (A-Box).
 The schema reuses DCAT and Dublin Core for dataset metadata, RDF Data Cube for measures and
 dimensions, CSVW for columns, SKOS for controlled vocabularies and QUDT for quantity kinds
 and units. A generator reads the 80 contracts and emits 39{,}390 triples; no instance data
@@ -87,7 +87,8 @@ Table~\ref{tab:effort} summarises the two attempts. In the first, the assistant 
 19 user prompts, 204 tool calls and 46 minutes of assistant time over four working days,
 with 73 intermediate versions of 26 files. Its outcome covered three contract constructs,
 and the phenomenon aliases were hand-tuned until coverage rose from 22 to 74 of 77 datasets.
-In the second, the mapping is a program: 1{,}277 lines of Python and 165 lines of schema.
+In the second, the mapping is a program: a generator of about 400 lines of Python and 168
+lines of hand-written schema; the whole study code has about 1{,}600 lines.
 \todo{Add the person-time of the second attempt and the list of design decisions.}
 
 \begin{table}[ht]
@@ -101,7 +102,7 @@ In the second, the mapping is a program: 1{,}277 lines of Python and 165 lines o
 Contract construct types represented & 3 of 65 & 59 of 65 \\
 Hand-written instance data & partly & none \\
 Instance data & 77 dataset bindings & 39{,}390 triples \\
-Schema, hand-written lines & 254 & 165 \\
+Schema, hand-written lines & 254 & 168 \\
 File versions kept & 73 snapshots & \todo{n} commits \\
 \bottomrule
 \end{tabular}
@@ -215,6 +216,13 @@ same accuracy on typed content with a third less context.
 \textbf{The migration works as an audit of the contracts.} Normalising values exposed
 inconsistent spellings, and typing the grain exposed contracts that declare no entity where
 one exists (the equivalent-reservoir datasets are typed at subsystem grain).
+
+\textbf{The remaining errors are confusions between siblings.} With any semantic layer the
+agent misses 11 of the 106 battery questions and 15 of the 204 selector questions under
+every condition. The wrong choices are almost always a neighbouring dataset of the same
+subject: daily load instead of monthly load, the general instead of the detailed scheduling
+balance, plant generation instead of installed capacity. Two selector questions expect a
+dataset that the catalogue marks as discontinued and therefore never offers.
 
 \textbf{Cross-dataset knowledge did not help routing.} The family-grain re-rank, the one
 mechanism that uses knowledge absent from individual contracts, was neutral.
