@@ -49,6 +49,13 @@ details summary{cursor:pointer;font-weight:500;padding:6px 0}
 .tree ul{list-style:none;margin:0;padding-left:20px;border-left:1px solid var(--line)}
 .tag{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-left:6px}
 .note{font-size:13px;color:var(--ink-3)}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) 52px;gap:2px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.mlab{grid-column:1 / -1;font-size:13px;color:var(--ink-2)}
+.mtrack{position:relative;height:14px;background:color-mix(in srgb,var(--line) 60%,transparent);border-radius:2px;min-width:0}
+.mtrack i{position:absolute;left:0;top:0;bottom:0;background:var(--sem);border-radius:2px}
+.mtrack b{position:absolute;top:6px;height:2px;background:var(--ink)}
+.mval{font-size:13px;font-variant-numeric:tabular-nums;text-align:right;font-weight:600}
+.mtok{grid-column:1 / -1;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
 </style>
 
 <div class="wrap">
@@ -111,6 +118,18 @@ details summary{cursor:pointer;font-weight:500;padding:6px 0}
     <p>Escolha um contrato para ver quanto dele foi representado.</p></div>
     <select id="pick" aria-label="Dataset"></select>
     <div class="panel" id="one"></div>
+  </section>
+
+  <section>
+    <div><h2>Roteamento: o servidor escolhe o dataset certo?</h2>
+    <p>O roteador do servidor é o mesmo em todas as linhas; muda só o catálogo que ele recebe. A barra é a fração de perguntas em que o dataset correto veio em primeiro lugar, e o traço fino é o intervalo de confiança de 95%.</p></div>
+    <div class="cols" id="routing"></div>
+  </section>
+
+  <section id="agentsec" hidden>
+    <div><h2>Agente com LLM: o modelo escolhe o dataset certo?</h2>
+    <p>Um modelo Claude no Amazon Bedrock usa as ferramentas de busca e descrição, alimentadas pelo catálogo de cada condição, e escolhe um dataset. A coluna de tokens é o contexto médio enviado ao modelo por pergunta.</p></div>
+    <div class="cols" id="agent"></div>
   </section>
 </div>
 
@@ -176,4 +195,17 @@ const show=()=>{const d=D.datasets[pick.value];
   document.getElementById('one').innerHTML=`<div class="row"><div class="name">${d.name}<div class="note">${pct(d.semantic,d.semantic+d.literal+d.dropped)} semântico</div></div>${bar(d)}<div class="n">${fmt(d.semantic+d.literal+d.dropped)}</div></div>`
    +`<p class="note" style="padding:8px 0">${fmt(d.semantic)} itens semânticos, ${fmt(d.literal)} literais, ${fmt(d.dropped)} descartados${d.na?`, ${fmt(d.na)} declarados como vazios no contrato`:''}.</p>`;};
 pick.addEventListener('change',show); show();
+
+// results: one panel per question set, single hue, value labelled on every row
+const f3 = v => v.toFixed(3).replace('.',',');
+const meter = r => `<div class="mrow" title="${r.label}: ${f3(r.v)} (IC 95% ${f3(r.lo)} a ${f3(r.hi)})">
+  <div class="mlab">${r.label}</div>
+  <div class="mtrack"><i style="width:${(100*r.v).toFixed(1)}%"></i><b style="left:${(100*r.lo).toFixed(1)}%;width:${(100*(r.hi-r.lo)).toFixed(1)}%"></b></div>
+  <div class="mval">${f3(r.v)}</div>${r.tokens!=null?`<div class="mtok">${fmt(r.tokens)} tokens · ${String(r.calls).replace('.',',')} chamadas</div>`:''}</div>`;
+const panel = (g,sub) => `<div class="panel"><strong>${g.gold}</strong> <span class="note">${sub}</span>${g.rows.map(meter).join('')}</div>`;
+document.getElementById('routing').innerHTML = D.routing.map(g=>panel(g,`${g.n} perguntas · acerto em 1º lugar`)).join('');
+if (D.agent.length) {
+  document.getElementById('agentsec').hidden = false;
+  document.getElementById('agent').innerHTML = D.agent.map(g=>panel(g,`${g.n} perguntas · ${g.model}, esforço ${g.effort}`)).join('');
+}
 </script>

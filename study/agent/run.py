@@ -31,7 +31,7 @@ for p in (ROOT, ROOT / "src"):
         sys.path.insert(0, str(p))
 
 import anthropic  # noqa: E402
-from anthropic import AnthropicBedrockMantle  # noqa: E402
+from anthropic import AnthropicBedrock, AnthropicBedrockMantle  # noqa: E402
 
 from mcp_tiago_dados_abertos.catalogo import ranking, retrieval  # noqa: E402
 from mcp_tiago_dados_abertos.catalogo.contracts import load_all_contracts  # noqa: E402
@@ -150,14 +150,17 @@ def main() -> int:
     g, full = Graph(), load_all_contracts()
     catalogs = {"schema": schema_only(full), "contracts": full,
                 "onto_sem": from_ontology(g, literals=False), "onto_full": from_ontology(g, literals=True)}
-    client = AnthropicBedrockMantle(aws_region=args.region)
+    # Model ids with a geography prefix (us., global.) are Bedrock inference profiles and
+    # are served by the bedrock-runtime endpoint; bare "anthropic." ids by the Mantle endpoint.
+    profile = args.model.split(".")[0] in ("us", "eu", "apac", "global")
+    client = (AnthropicBedrock if profile else AnthropicBedrockMantle)(aws_region=args.region)
 
     result = {"gold": args.gold.name, "n": len(gold), "model": args.model, "effort": args.effort,
               "corpus_commit": subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT,
                                               capture_output=True, text=True).stdout.strip(),
               "conditions": {}, "items": {}}
     for cond in args.conditions:
-        cat, rows, t0 = Catalogue(catalogs[cond]), [], time.time()
+        cat, rows, t0, errors = Catalogue(catalogs[cond]), [], time.time(), 0
         for it in gold:
             try:
                 r = ask(client, args.model, args.effort, cat, it["question"])
@@ -165,6 +168,11 @@ def main() -> int:
                 time.sleep(30)
                 r = ask(client, args.model, args.effort, cat, it["question"])
             except anthropic.APIStatusError as e:
+                errors += 1
+                if errors == 1:
+                    print(f"  API error {e.status_code}: {str(e.message)[:200]}", file=sys.stderr)
+                if errors >= 5 and errors == len(rows) + 1:
+                    raise SystemExit("every request failed; stopping before spending more time")
                 r = {"choice": None, "stop": f"api_error_{e.status_code}", "tool_calls": 0,
                      "input": 0, "output": 0, "cache_read": 0, "cache_write": 0}
             r["id"], r["correct"] = it.get("id"), bool(r["choice"]) and r["choice"] in it["valid"]
@@ -179,7 +187,7 @@ def main() -> int:
             "tool_calls_mean": sum(r["tool_calls"] for r in rows) / n,
             "input_tokens_mean": sum(r["input"] + r["cache_read"] + r["cache_write"] for r in rows) / n,
             "output_tokens_mean": sum(r["output"] for r in rows) / n,
-            "seconds": round(time.time() - t0, 1),
+            "api_errors": errors, "seconds": round(time.time() - t0, 1),
         }
         result["items"][cond] = rows
         c = result["conditions"][cond]

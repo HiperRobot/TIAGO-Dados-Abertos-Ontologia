@@ -1,0 +1,149 @@
+{
+ "first_attempt": {
+  "assistant_model": "claude-opus-4.5",
+  "events": 1025,
+  "user_prompts": 19,
+  "tool_calls": 204,
+  "assistant_seconds": 2757,
+  "working_days": [
+   {
+    "day": "2026-09-23",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   },
+   {
+    "day": "2026-10-15",
+    "user_prompts": 4,
+    "assistant_messages": 120,
+    "tool_calls": 75,
+    "assistant_seconds": 1076
+   },
+   {
+    "day": "2026-10-16",
+    "user_prompts": 2,
+    "assistant_messages": 56,
+    "tool_calls": 32,
+    "assistant_seconds": 401
+   },
+   {
+    "day": "2026-10-20",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   },
+   {
+    "day": "2026-10-23",
+    "user_prompts": 3,
+    "assistant_messages": 8,
+    "tool_calls": 2,
+    "assistant_seconds": 82
+   },
+   {
+    "day": "2026-10-29",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   },
+   {
+    "day": "2026-10-30",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   },
+   {
+    "day": "2026-11-02",
+    "user_prompts": 6,
+    "assistant_messages": 115,
+    "tool_calls": 62,
+    "assistant_seconds": 1070
+   },
+   {
+    "day": "2026-11-05",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   },
+   {
+    "day": "2026-11-09",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   },
+   {
+    "day": "2026-11-10",
+    "user_prompts": 4,
+    "assistant_messages": 23,
+    "tool_calls": 26,
+    "assistant_seconds": 128
+   },
+   {
+    "day": "2026-11-11",
+    "user_prompts": 0,
+    "assistant_messages": 0,
+    "tool_calls": 1,
+    "assistant_seconds": 0
+   }
+  ],
+  "tool_calls_by_tool": {
+   "str_replace": 48,
+   "execute_pwsh": 38,
+   "read_file": 34,
+   "fs_write": 23,
+   "todo_list": 17,
+   "fetch_cloud_config": 11,
+   "remote_web_search": 11,
+   "control_pwsh_process": 6,
+   "get_process_output": 6,
+   "list_directory": 5,
+   "delete_file": 4,
+   "list_processes": 1
+  },
+  "file_snapshots": 73,
+  "distinct_files": 26,
+  "most_revised_files": {
+   "research/harness/run_benchmark.py": 10,
+   "research/harness/conditions.py": 7,
+   "research/harness/gerar_bindings.py": 7,
+   "research/ontologia/ons_ontologia.json": 6,
+   "research/harness/ontology_boost.py": 6,
+   "research/PROTOCOLO.md": 6,
+   "research/harness/unit_conditions.py": 5,
+   "research/harness/.gitignore": 3
+  }
+ },
+ "second_attempt": {
+  "commits": 3,
+  "commit_log": [
+   "de21ac2 2026-11-11 study: agent round on Amazon Bedrock (LLM picks the dataset through tools)",
+   "23ecb80 2026-11-11 study: routing harness on human-written questions, ontology JSON export, thesis skeleton",
+   "94af8d4 2026-11-11 study: ontology v0.2 (T-Box + A-Box derived from the ODCS contracts) and fidelity ledger"
+  ],
+  "python_lines": {
+   "study/__init__.py": 0,
+   "study/agent/__init__.py": 0,
+   "study/agent/run.py": 206,
+   "study/agent/stats.py": 45,
+   "study/gold/extract_backend_gold.py": 73,
+   "study/mcp/__init__.py": 0,
+   "study/mcp/server.py": 147,
+   "study/ontology/build_abox.py": 534,
+   "study/process/effort.py": 111,
+   "study/routing/__init__.py": 0,
+   "study/routing/catalogs.py": 181,
+   "study/routing/metrics.py": 61,
+   "study/routing/run.py": 111,
+   "study/viz/render.py": 90
+  },
+  "python_lines_total": 1559,
+  "tbox_lines_hand_written": 165,
+  "abox_triples_generated": 39390,
+  "hand_written_instance_data": 0
+ }
+}
