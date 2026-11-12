@@ -22,9 +22,16 @@ summing either along time produces a number that looks plausible and is wrong.
 
 The work extends an existing system rather than building a new one. The demand for
 evolution came from a practical question raised in the project: whether an ontology would
-serve agents better than the contracts already in place. \todo{Manual, item 1: computing
-environment (Python 3.12 or later, FastMCP, DuckDB, parquet on S3, Amazon Bedrock) and how
-the work applies what was learned in the course.}
+serve agents better than the contracts already in place. The author is a development intern
+at ONS and a member of the team that builds the server and TIAGO PDA, the open-data portal
+of the operator; to the best of the team's knowledge, the server is the first MCP server of
+the Brazilian power sector.
+
+The server is written in Python 3.12 with the FastMCP framework and answers SQL queries
+with DuckDB over Parquet files that ONS publishes on Amazon S3. The study code is also in
+Python, the ontology is written in RDF (Turtle), and the agent experiments run on Amazon
+Bedrock. \todo{Manual, item 1: one sentence on how the work applies what was learned in
+the course (name the disciplines).}
 
 \section{Goal and Research Questions}
 The goal of this work, stated with the GQM template \cite{basili1988tame}, is to

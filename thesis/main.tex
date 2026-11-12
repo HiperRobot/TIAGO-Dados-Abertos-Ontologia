@@ -21,8 +21,10 @@
 \usepackage{tabularx}
 \usepackage{enumitem}
 \usepackage{xcolor}
-\Sepackage{url}
-Sepackage[hidelinks]{hyperref}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
 \usepackage[alf]{abntex2cite} % ABNT NBR 6023, author-year
 
 \pagestyle{fancy}
@@ -84,6 +86,17 @@ Rio de Janeiro\par \thesisdate
 \end{flushright}
 \clearpage
 
+% ---- Agradecimentos ---------------------------------------------------------
+\selectlanguage{brazil}
+\section*{Agradecimentos}
+\`A minha fam\'ilia, pelo apoio em todos os momentos do curso.
+
+Aos meus amigos e aos colegas do Departamento de Inform\'atica, pela companhia e pela ajuda
+ao longo da gradua\c{c}\~ao.
+
+Ao meu orientador, professor Marcos Kalinowski, pela orienta\c{c}\~ao deste trabalho.
+\clearpage
+
 % ---- Resumo / Abstract (max. 250 words each, up to five keywords) -----------
 \selectlanguage{brazil}
 \section*{Resumo}
@@ -93,11 +106,27 @@ Rio de Janeiro\par \thesisdate
 Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
 
 \vspace{1em}
-\noindent \todo{Resumo em portugu\^es: objetivo, m\'etodo, resultados e conclus\~oes, em um par\'agrafo.}
+\noindent Agentes baseados em modelos de linguagem consultam dados por meio de ferramentas, e
+o que sabem sobre cada conjunto de dados \'e o que a camada de descri\c{c}\~ao lhes informa.
+Este trabalho apresenta um estudo de caso da migra\c{c}\~ao de contratos de dados para uma
+ontologia no TIAGO Dados Abertos, servidor de c\'odigo aberto que exp\~oe os dados abertos do
+Operador Nacional do Sistema El\'etrico (ONS) pelo Model Context Protocol. A migra\c{c}\~ao
+\'e caracterizada quanto a esfor\c{c}o, fidelidade do mapeamento, efic\'acia do roteamento,
+efic\'acia do agente e custo de contexto. Uma ontologia que reutiliza vocabul\'arios padr\~ao
+foi gerada a partir dos 80 contratos, com 39.390 triplas e nenhuma inst\^ancia escrita \`a
+m\~ao. Dos construtos dos contratos, 56,6\% tornaram-se conhecimento tipado, 40,2\% foram
+preservados como texto e 3,2\% foram descartados. Em dois conjuntos de perguntas escritas
+por pessoas do ONS (106 e 204 perguntas), o roteador do servidor teve com a ontologia
+completa o mesmo desempenho que com os contratos, e desempenho inferior quando o texto livre
+foi removido. Um agente com o modelo Claude Sonnet 5.5 escolheu o conjunto de dados correto
+com acur\'acia equivalente usando contratos (0,858 e 0,912) ou a ontologia apenas com
+conte\'udo tipado (0,868 e 0,917), consumindo com esta cerca de um ter\c{c}o a menos de
+tokens de entrada. Conclui-se que, neste caso, a ontologia derivada de contratos ricos
+preserva o que eles sabem e reduz o custo de contexto, sem aumentar a acur\'acia.
 
 \vspace{1em}
 \noindent\textbf{Palavras-chave}\par
-\noindent \todo{at\'e cinco}: contratos de dados; ontologias; agentes baseados em LLM; Model Context Protocol; estudo de caso.
+\noindent contratos de dados; ontologias; agentes baseados em LLM; Model Context Protocol; estudo de caso.
 \end{singlespace}
 
 \selectlanguage{english}
@@ -108,7 +137,21 @@ Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
 Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
 
 \vspace{1em}
-\noindent \todo{Abstract: goal, method, results and conclusions, one paragraph.}
+\noindent Agents based on language models query data through tools, and what they know about
+each dataset is what the description layer tells them. This work presents a case study of
+the migration of data contracts to an ontology in TIAGO Dados Abertos, an open-source server
+that exposes the open data of the Brazilian power system operator (ONS) through the Model
+Context Protocol. The migration is characterised with respect to effort, mapping fidelity,
+routing effectiveness, agent effectiveness and context cost. An ontology that reuses
+standard vocabularies was generated from the 80 contracts, with 39,390 triples and no
+hand-written instance. Of the contract constructs, 56.6\% became typed knowledge, 40.2\%
+were preserved as text and 3.2\% were dropped. On two sets of questions written by ONS staff
+(106 and 204 questions), the router of the server performed with the full ontology as it
+did with the contracts, and worse when free text was removed. An agent running Claude
+Sonnet 5.5 chose the correct dataset with equivalent accuracy using the contracts (0.858
+and 0.912) or the ontology with typed content only (0.868 and 0.917), and with the latter
+consumed about one third fewer input tokens. In this case, an ontology derived from rich
+contracts preserves what they know and reduces context cost, without increasing accuracy.
 
 \vspace{1em}
 \noindent\textbf{Keywords}\par

@@ -34,8 +34,50 @@ each one carries a \texttt{semantics} block with row grain, metric definitions a
 aggregation rules. The domain has quantities that cannot be aggregated in the same way
 (average power in MWmed, stored energy in MWmes), so a wrong answer can be silently
 plausible. And the author works at the organisation and had access to question sets written
-by its staff. \todo{Describe the author's role; add the architecture figure required by
-item 5 of the manual.}
+by its staff.
+
+The author is a development intern at ONS. He joined the organisation after his results in
+its datathons, to help build TIAGO PDA, the open-data portal of the operator, and the MCP
+server studied here, which to the best of the team's knowledge is the first MCP server of
+the Brazilian power sector. The study was therefore carried out by a member of the team that
+develops the system, on the system itself. This gives access to the code, to the contracts
+and to the people who wrote the questions, and it is also a source of bias that is discussed
+with the threats to validity.
+
+Figure~\ref{fig:architecture} shows the architecture of the server and the part changed by
+the study. An agent calls the tools of the server through MCP. The search and describe tools
+answer from a catalogue, which in production is built from the data contracts; the SQL tool
+runs queries with DuckDB over Parquet files published by ONS on S3. The study replaces only
+the catalogue: the router, the tools and the data stay as they are.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum height=0.9cm, text width=3.1cm},
+  var/.style={box, dashed, text width=2.5cm},
+  arr/.style={-{Stealth[length=2mm]}, semithick},
+  node distance=0.8cm and 0.9cm]
+\node[box] (agent) {LLM-based agent\\(Amazon Bedrock)};
+\node[box, below=of agent] (mcp) {MCP server\\search, describe, SQL tools};
+\node[box, below left=of mcp] (router) {Router\\BM25 and keyword rules};
+\node[box, below right=of mcp] (duck) {DuckDB};
+\node[box, below=of duck] (s3) {Parquet files on S3\\(ONS open data)};
+\node[var, below=of router, xshift=-2.9cm] (schema) {Schema only};
+\node[var, below=of router] (contracts) {ODCS data contracts};
+\node[var, below=of contracts] (onto) {Ontology\\(T-Box and A-Box)};
+\draw[arr] (agent) -- node[right, font=\scriptsize] {MCP} (mcp);
+\draw[arr] (mcp) -| (router);
+\draw[arr] (mcp) -| (duck);
+\draw[arr] (duck) -- (s3);
+\draw[arr] (router) -- (contracts);
+\draw[arr] (router) -| (schema);
+\draw[arr] (contracts) -- node[right, font=\scriptsize] {generator, ledger} (onto);
+\end{tikzpicture}
+\caption{Architecture of the server. Dashed boxes are the catalogues compared in the study;
+the ontology is generated from the contracts.}
+\label{fig:architecture}
+\end{figure}
 
 \section{Data Collection}
 \textbf{Contracts and ontology.} The ontology was built twice. A first, exploratory attempt
@@ -90,7 +132,19 @@ with 73 intermediate versions of 26 files. Its outcome covered three contract co
 and the phenomenon aliases were hand-tuned until coverage rose from 22 to 74 of 77 datasets.
 In the second, the mapping is a program: a generator of about 400 lines of Python and 168
 lines of hand-written schema; the whole study code has about 1{,}600 lines.
-\todo{Add the person-time of the second attempt and the list of design decisions.}
+The second attempt was also carried out with an AI coding assistant, a different one, in a
+single working day. The log of that session holds 31 user prompts and 244 tool calls. These
+figures cover more than the migration: the same session reviewed the first attempt, ran the
+experiments and drafted this text. The time the author spent reading and deciding was not
+recorded in either attempt, so the figures describe the interaction with the assistants and
+not person-hours.
+
+Six design decisions separate the second attempt from the first: (i) instance data is
+generated from the contracts and never written by hand; (ii) standard vocabularies are
+reused before any term is coined; (iii) content that cannot be typed is kept as a literal,
+and every such case is recorded in the ledger; (iv) alignments to the IEC CIM are loose
+matches only; (v) the production router is not modified; and (vi) only questions written
+by people are used for evaluation.
 
 \begin{table}[ht]
 \centering\small
@@ -104,7 +158,9 @@ Contract construct types represented & 3 of 65 & 59 of 65 \\
 Hand-written instance data & partly & none \\
 Instance data & 77 dataset bindings & 39{,}390 triples \\
 Schema, hand-written lines & 254 & 168 \\
-File versions kept & 73 snapshots & \todo{n} commits \\
+Working days with activity & 4 & 1 \\
+User prompts to the assistant & 19 & 31 \\
+Tool calls by the assistant & 204 & 244 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -254,7 +310,13 @@ contracts condition and may not hold elsewhere.
 repository, pinned to a corpus commit. The question sets and the assistant log are not
 public; the scripts that convert them are. The names of the IEC CIM classes used in the
 alignments were checked against the CIM17 schema documentation; the namespace IRI was not. Much of the code was produced with AI assistants under the author's
-direction.
+direction. The author is a member of the team that develops the server, which may bias the
+design of the ontology and the reading of the results; the evaluation therefore relies on
+questions written by other people and on automatic scoring.
 
 \section{Concluding Remarks}
-\todo{Two or three sentences closing the chapter.}
+In this case, migrating rich data contracts to an ontology preserved what the contracts
+knew, at the cost of one generator and a small hand-written schema, and did not make the
+agent more accurate. What changed was the cost: the agent reached the same accuracy with
+less context. The next chapter discusses what follows from this and what the study leaves
+open.
