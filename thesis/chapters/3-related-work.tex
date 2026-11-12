@@ -16,8 +16,18 @@ ontology, that a single agent model is used, and that no significance test is re
 \citeonline{rumiantsau2026semantic} compare, in a paired design, three frontier models
 answering 100 questions over a retail dataset with the schema alone or with the schema plus
 a hand-written semantic document of 4~KB. The document adds 17 to 23 percentage points of
-accuracy, from 45.5--50.5\% to 67.7--68.7\%. \todo{Read the full text for the definitions of
-accuracy and hallucination and for the statistical test; only the abstract was available.}
+accuracy, from 45.5--50.5\% to 67.7--68.7\%. Each model answers in a single shot, with no
+tools, and a language model judges whether the rows returned match those of a reference
+query; one question was excluded, leaving 99. The analysis is the one adopted here: Wilson
+intervals for each configuration and the exact McNemar test on paired outcomes, with the
+discordant counts reported. Within each condition the three models do not differ
+significantly, so the semantic document, and not the choice of model, explains the variance.
+The document adds about 2{,}200 tokens to the prompt, and mean input tokens are reported per
+configuration. The authors do not measure hallucination separately, use one dataset, and
+note that the judge belongs to the same family as two of the models tested. They also
+mention, without detail, that an agent with tools and the same semantic knowledge did not
+outperform the schema-only baseline, and leave agentic settings to future work, which is the
+setting studied here.
 
 \section{Ontologies and Knowledge Graphs over Enterprise Data}
 \citeonline{sequeda2023benchmark} built a benchmark of 43 questions over a 13-table subset
@@ -67,7 +77,7 @@ between the two layers is itself measured.
 Work & Layers compared & Effectiveness metric & Questions & Statistical test \\
 \midrule
 \citeonline{bandari2025aiready} & schema; contract; extended contract & execution accuracy & 120 & not reported \\
-\citeonline{rumiantsau2026semantic} & schema; schema + semantic document & accuracy & 100 & $p<0.01$ \\
+\citeonline{rumiantsau2026semantic} & schema; schema + semantic document & pass rate judged by a language model & 99 & McNemar \\
 \citeonline{sequeda2023benchmark} & SQL schema; knowledge graph with ontology & execution accuracy & 43 & not reported \\
 \citeonline{allemang2024ontologies} & knowledge graph; + ontology check & execution accuracy, unknown rate & 43 & not reported \\
 \citeonline{fitch2026natural} & eight ontology representations & query accuracy & 21 & not reported \\

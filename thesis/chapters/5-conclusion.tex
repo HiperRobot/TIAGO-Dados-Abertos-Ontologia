@@ -11,14 +11,14 @@ The main findings are three. More than half of the contract content becomes type
 and 40\% survives as literals; what is left behind is physical and operational. For the
 lexical router of the server the ontology is at best equivalent to the contracts, and loses
 5 to 8 points of top-1 accuracy when free text is removed. For an LLM-based agent the
-ontology with typed content only is as accurate as the contracts and uses about a third
-less context.
+ontology with typed content only is as accurate as the contracts and uses between a third
+and almost three fifths less context, under three models of different sizes.
 
 \section{Limitations}
 The study covers one organisation, one catalogue and one language. Effectiveness was
 measured as the choice of the dataset, not as the correctness of the final answer. The agent
-round used one model family and each condition was run once on a non-deterministic model.
-\todo{Update with the repeat run and the second model.} The ontology content derives from
+round used three models of one family, and each condition was run once on non-deterministic
+models; a repeat of two conditions changed the outcome of three to four questions out of 106. The ontology content derives from
 the contracts, so the study says little about ontologies built from independent domain
 knowledge. The question sets are not public.
 

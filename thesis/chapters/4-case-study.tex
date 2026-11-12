@@ -113,7 +113,7 @@ and one with semantic and literal content. The re-rank moves members of a measur
 the grain named in the question ahead of their siblings and has no tunable weight. Top-1,
 top-3 and MRR are reported with 95\% Wilson intervals.
 
-For RQ4 and RQ5, a Claude Sonnet 5.5 model on Amazon Bedrock receives a search tool, a
+For RQ4 and RQ5, a Claude Sonnet 5.5 model on Amazon Bedrock (and, in a second step, Claude Haiku 5.5 and Claude Opus 5.5) receives a search tool, a
 describe tool and a final-answer tool, all backed by the catalogue of the condition. The
 answer is correct when the chosen dataset is one of the valid ones. Input tokens per
 question measure the context cost. Sampling parameters cannot be set on this model, so the
@@ -255,11 +255,60 @@ in 103 and 99 of the 106 questions, and correctness changed in three and four qu
 Run-to-run variation is therefore of the same size as the difference between the two
 conditions.
 
+The round was then repeated with two other models of the same family, Claude Haiku 5.5 and
+Claude Opus 5.5, with the same prompt and tools (Table~\ref{tab:models}). The pattern holds:
+in none of the six combinations of model and question set do the contracts and an ontology
+catalogue differ significantly (at most eleven discordant questions, no adjusted $p$ below
+0.75). Contracts beat schema only in five of the six; with Opus on the selector set the
+gain is 3.9 points and not significant (adjusted $p=0.23$), because that model already
+reaches 0.853 with the schema alone. The differences between models are smaller than the
+difference between having and not having a semantic layer.
+
+\begin{table}[ht]
+\centering\small
+\caption{Agent accuracy with three models. B: battery ($n=106$); S: selector set ($n=204$).}
+\label{tab:models}
+\begin{tabular}{llcccc}
+\toprule
+Model & Set & Schema & Contracts & Ontology, semantic & Ontology, full \\
+\midrule
+Haiku 5.5 & B & 0.613 & 0.830 & 0.830 & 0.858 \\
+ & S & 0.770 & 0.868 & 0.873 & 0.863 \\
+Sonnet 5.5 & B & 0.660 & 0.858 & 0.868 & 0.877 \\
+ & S & 0.838 & 0.912 & 0.917 & 0.912 \\
+Opus 5.5 & B & 0.717 & 0.868 & 0.849 & 0.887 \\
+ & S & 0.853 & 0.892 & 0.902 & 0.892 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{RQ5: Cost}
-The semantic-only ontology catalogue delivers the accuracy of the contracts with about a
-third less context: 2{,}317 fewer input tokens per question on the battery (95\% interval
-1{,}145 to 3{,}587) and 2{,}017 fewer on the selector set (1{,}199 to 2{,}913). The whole
-round consumed 6.0 million input tokens and 0.23 million output tokens.
+The semantic-only ontology catalogue delivers the accuracy of the contracts with less
+context under every model (Table~\ref{tab:tokens}). With Sonnet the saving is about a third:
+2{,}317 fewer input tokens per question on the battery (95\% interval 1{,}145 to 3{,}587)
+and 2{,}017 fewer on the selector set (1{,}199 to 2{,}913). With Haiku and Opus, which make
+more tool calls per question and read more contract text, the saving is 56 to 58\%: about
+10{,}000 tokens per question with Haiku and 8{,}000 to 8{,}800 with Opus, with intervals
+that exclude zero in all cases. The three rounds consumed 29.9 million input tokens and 1.05
+million output tokens.
+
+\begin{table}[ht]
+\centering\small
+\caption{Mean input tokens per question. B: battery; S: selector set.}
+\label{tab:tokens}
+\begin{tabular}{llrrrr}
+\toprule
+Model & Set & Schema & Contracts & Ontology, semantic & Saving vs.\ contracts \\
+\midrule
+Haiku 5.5 & B & 5{,}443 & 17{,}821 & 7{,}566 & 58\% \\
+ & S & 5{,}283 & 17{,}332 & 7{,}341 & 58\% \\
+Sonnet 5.5 & B & 3{,}999 & 6{,}777 & 4{,}460 & 34\% \\
+ & S & 3{,}624 & 6{,}117 & 4{,}100 & 33\% \\
+Opus 5.5 & B & 6{,}010 & 15{,}488 & 6{,}702 & 57\% \\
+ & S & 5{,}372 & 14{,}138 & 6{,}153 & 56\% \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Discussion and Lessons Learned}
 \textbf{A generated ontology is a lossless carrier, so its value lies elsewhere.} Because
@@ -274,7 +323,7 @@ to the contracts without any free text.
 
 \textbf{An agent needs less text than a lexical router.} Free text and example questions are
 worth 5 to 8 points to the BM25 router and nothing measurable to the agent, which reaches the
-same accuracy on typed content with a third less context.
+same accuracy on typed content with a third to almost three fifths less context, depending on the model.
 
 \textbf{The migration works as an audit of the contracts.} Normalising values exposed
 inconsistent spellings, and typing the grain exposed contracts that declare no entity where
@@ -303,7 +352,7 @@ ontology was designed: the generator has no parameter fitted to them, but the de
 not blind to those results.
 
 \textbf{External validity.} One organisation, one catalogue of 80 datasets, questions in
-Portuguese, one router and one model. The contracts are richer than usual, which favours the
+Portuguese, one router and three models of a single family. The contracts are richer than usual, which favours the
 contracts condition and may not hold elsewhere.
 
 \textbf{Reliability.} Code, ontology, ledger and aggregate results are public in the study
