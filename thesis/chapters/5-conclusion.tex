@@ -1,15 +1,38 @@
 \chapter{Conclusion}
 
 \section{Contributions}
-\todo{Restate the contributions against the research questions.}
+This work characterised the migration of the data contracts of a real MCP server to an
+ontology. It delivered an ontology whose content is generated from the 80 contracts, a
+ledger that states how each contract construct was represented, an evaluation with a
+deterministic router and with an LLM-based agent on questions written by people, and a
+prototype server that answers from the ontology.
+
+The main findings are three. More than half of the contract content becomes typed knowledge
+and 40\% survives as literals; what is left behind is physical and operational. For the
+lexical router of the server the ontology is at best equivalent to the contracts, and loses
+5 to 8 points of top-1 accuracy when free text is removed. For an LLM-based agent the
+ontology with typed content only is as accurate as the contracts and uses about a third
+less context.
 
 \section{Limitations}
-\todo{Single case; deterministic router unless the LLM round is completed; question sets
-from one organisation; ontology alignments to CIM not verified.}
+The study covers one organisation, one catalogue and one language. Effectiveness was
+measured as the choice of the dataset, not as the correctness of the final answer. The agent
+round used one model family and each condition was run once on a non-deterministic model.
+\todo{Update with the repeat run and the second model.} The ontology content derives from
+the contracts, so the study says little about ontologies built from independent domain
+knowledge. The question sets are not public.
 
 \section{Future Work}
-\todo{Second annotator and inter-rater agreement on the question sets; an ontology-aware
-dense retriever; SQL generation with joins guided by the spatial hierarchy; replication on
-the catalogue of another organisation.}
+\begin{itemize}[leftmargin=1.5cm]
+\item Evaluate the final answer: execute the generated SQL and compare values, including
+executable but wrong answers caused by units and aggregation.
+\item Add knowledge that the contracts do not hold, such as the relations between plants,
+reservoirs and basins, and measure questions that need it.
+\item Obtain a second annotation of the question sets and report inter-rater agreement.
+\item Replace the lexical router with a retriever that uses the ontology graph.
+\item Replicate the migration on the catalogue of another organisation.
+\end{itemize}
 
-\todo{Manual, item 7: what was learned, and what would be done differently.}
+\todo{Manual, item 7: what was learned, and what would be done differently. Candidate
+points: start from a generator instead of hand-written instances; open the human-written
+question sets before building anything; keep the process under version control from day one.}
