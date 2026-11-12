@@ -1,17 +1,77 @@
 \chapter{Related Work}
 
 \section{Extending Data Contracts and Semantic Layers for Agent Consumption}
-\todo{\citeonline{bandari2025aiready}: raw schema vs.\ contract vs.\ full specification,
-120 questions, execution accuracy. Closest design to ours; no ontology, no significance test.}
+The closest work to this study is that of \citeonline{bandari2025aiready}, who propose a
+specification for data products meant to be consumed by agents. It extends data contracts
+with entity and grain declarations, join paths with cardinality, governed metric
+definitions, synonym bindings, value domains, quality and freshness signals, usage
+constraints, and an interface exposed through MCP. They evaluate a GPT-4o agent on 120
+business questions over four data products under three conditions: the raw schema, the
+schema with a conventional contract, and the full specification. Execution accuracy rises
+from 41.9\% to 53.9\% and to 79.7\%, and answers that execute but are semantically wrong
+fall from 41.1\% to 11.9\% of the runs. The design is the same incremental comparison used
+here. The differences are that their richest condition is a richer contract, not an
+ontology, that a single agent model is used, and that no significance test is reported.
 
-\todo{\citeonline{sequeda2023benchmark} and \citeonline{allemang2024ontologies}: knowledge
-graph and ontology over an enterprise SQL schema; accuracy 16\% to 54\% to 72\%.}
+\citeonline{rumiantsau2026semantic} compare, in a paired design, three frontier models
+answering 100 questions over a retail dataset with the schema alone or with the schema plus
+a hand-written semantic document of 4~KB. The document adds 17 to 23 percentage points of
+accuracy, from 45.5--50.5\% to 67.7--68.7\%. \todo{Read the full text for the definitions of
+accuracy and hallucination and for the statistical test; only the abstract was available.}
 
-\todo{Semantic layers for LLM analytics; MCP tool selection benchmarks; ontology and
-mapping generation with LLMs. Every item here must be read in full before it is cited:
-the survey behind this chapter was made from abstracts.}
+\section{Ontologies and Knowledge Graphs over Enterprise Data}
+\citeonline{sequeda2023benchmark} built a benchmark of 43 questions over a 13-table subset
+of an insurance data model and compared GPT-4 answering with SQL over the database against
+SPARQL over a knowledge graph of the same data with an ontology. Accuracy, measured as
+execution accuracy averaged over runs, was 16.7\% for SQL and 54.2\% for the knowledge
+graph; for questions over more than four tables SQL scored zero. The authors list among
+the limitations the use of a single model and of one-to-one mappings between tables and
+ontology terms. \citeonline{allemang2024ontologies} extended the approach with a
+deterministic check of the generated query against the ontology and a repair loop of up to
+three cycles, after which an unrepaired query is returned as unknown. Accuracy rose to
+72.55\%, with 8\% of unknown answers and an error rate of 19.44\%.
+
+These studies compare a database without a semantic layer against one with an ontology. The
+present case starts from a system that already has a rich semantic layer in its contracts,
+which is the situation in which the benefit of an ontology is least obvious.
+
+\citeonline{fitch2026natural} study how the representation of an ontology affects query
+generation by locally served models, with 21 competency questions over a research archive.
+Among eight representations, accuracy of the generated SPARQL ranged from 100\% for the
+default representation to 10\% for one that replaces names by abstract identifiers. This
+supports the finding of this case that the vocabulary carried by the ontology matters more
+than its structure.
+
+\section{Tool and Dataset Selection in MCP}
+\citeonline{mudunuri2026semantic} retrieve MCP tools by embedding similarity instead of
+exposing the whole catalogue. On 140 queries over 121 tools from five servers they report a
+hit rate of 97.1\% at $K=3$, a mean reciprocal rank of 0.91 and a 99.6\% reduction in
+tool-related tokens. \citeonline{mo2025livemcpbench} evaluate agents on 95 tasks over 70
+servers and 527 tools, with success judged by a language model; most models succeed in 30
+to 50\% of the tasks, and in the trajectories analysed half of the failures are retrieval
+errors. Both use the measures adopted here for routing (hit rate, reciprocal rank) and for
+cost (tokens).
 
 \section{Positioning}
-\todo{Table: work, layers compared, metrics, size of the question set, statistical test.
-Our case adds an ontology layer derived from contracts, a real MCP server, and a
-construct-level fidelity measure.}
+Table~\ref{tab:related} places this study among the related work. It differs in three
+respects: the ontology is derived from contracts that are already rich; the comparison is
+made on a server in production with questions written by its organisation; and the mapping
+between the two layers is itself measured.
+
+\begin{table}[ht]
+\centering\footnotesize
+\caption{Related work and this study.}
+\label{tab:related}
+\begin{tabularx}{\textwidth}{@{}p{2.6cm}Xp{2.5cm}p{1.6cm}p{1.7cm}@{}}
+\toprule
+Work & Layers compared & Effectiveness metric & Questions & Statistical test \\
+\midrule
+\citeonline{bandari2025aiready} & schema; contract; extended contract & execution accuracy & 120 & not reported \\
+\citeonline{rumiantsau2026semantic} & schema; schema + semantic document & accuracy & 100 & $p<0.01$ \\
+\citeonline{sequeda2023benchmark} & SQL schema; knowledge graph with ontology & execution accuracy & 43 & not reported \\
+\citeonline{allemang2024ontologies} & knowledge graph; + ontology check & execution accuracy, unknown rate & 43 & not reported \\
+\citeonline{fitch2026natural} & eight ontology representations & query accuracy & 21 & not reported \\
+This study & schema; contracts; ontology derived from contracts & routing and agent accuracy, tokens & 106 and 204 & McNemar, Holm \\
+\bottomrule
+\end{tabularx}
+\end{table}

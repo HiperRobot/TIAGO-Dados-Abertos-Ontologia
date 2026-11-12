@@ -75,7 +75,8 @@ For RQ4 and RQ5, a Claude Sonnet 5.5 model on Amazon Bedrock receives a search t
 describe tool and a final-answer tool, all backed by the catalogue of the condition. The
 answer is correct when the chosen dataset is one of the valid ones. Input tokens per
 question measure the context cost. Sampling parameters cannot be set on this model, so the
-round is not deterministic; each condition was run once.
+round is not deterministic. Each condition was run once; two conditions were repeated on the
+battery to measure the variation between runs.
 
 Paired differences use the exact McNemar test with Holm correction, and paired bootstrap
 intervals with 10{,}000 resamples.
@@ -192,6 +193,12 @@ difference in accuracy: at most seven discordant questions in any comparison, an
 schema only, the agent gives no answer for 12\% of the battery questions; with any semantic
 layer, for at most 2\%.
 
+Repeating the contracts and the semantic-only conditions on the battery gave accuracies of
+0.868 and 0.868, against 0.858 and 0.868 in the first run. The agent chose the same dataset
+in 103 and 99 of the 106 questions, and correctness changed in three and four questions.
+Run-to-run variation is therefore of the same size as the difference between the two
+conditions.
+
 \subsection{RQ5: Cost}
 The semantic-only ontology catalogue delivers the accuracy of the contracts with about a
 third less context: 2{,}317 fewer input tokens per question on the battery (95\% interval
@@ -234,8 +241,8 @@ mapping decisions made by the author, which are explicit in the generator. The q
 were written for another system and their expected datasets reflect that system's catalogue.
 
 \textbf{Internal validity.} The ontology content comes from the same contracts it is
-compared with, which bounds what it can add. The agent round was run once per condition on a
-non-deterministic model. The question sets had already been used to evaluate the first attempt when the second
+compared with, which bounds what it can add. The agent runs on a non-deterministic model; the
+repeat of two conditions changed the outcome of three to four questions out of 106. The question sets had already been used to evaluate the first attempt when the second
 ontology was designed: the generator has no parameter fitted to them, but the design was
 not blind to those results.
 

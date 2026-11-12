@@ -1,15 +1,48 @@
 \chapter{Background}
 
 \section{LLM-based Agents}
-\todo{Agents, tool use, why tool and data descriptions drive behaviour.}
+An agent based on a large language model alternates between generating text and calling
+tools. The model receives a task, a description of the tools it may call and the results of
+previous calls, and decides the next step. Everything the agent knows about an external
+system reaches it as text in this loop: the descriptions of the tools and what the tools
+return. The amount of that text is the context the agent consumes, and it is billed and
+limited. \todo{Add one or two references on tool-using agents.}
 
 \section{Model Context Protocol}
-\todo{Tools, resources, prompts; how a server describes data to a client.}
+The Model Context Protocol (MCP) is an open standard for connecting AI applications to
+external systems \cite{mcp2026intro}. A server can expose three kinds of primitives: tools,
+which are executable functions the application can invoke; resources, which are data sources
+that provide context; and prompts, which are reusable templates. The server studied here
+exposes its catalogue through four tools and one resource. \todo{Add who introduced the
+protocol and when, from a primary source.}
 
 \section{Data Contracts}
-\todo{Open Data Contract Standard (ODCS). Structure of the contracts in the case: schema,
-custom properties, the \texttt{semantics} block (row grain, metrics, aggregation rules).}
+A data contract is a document, kept with the data, that states what a dataset contains and
+what its consumers may rely on. The Open Data Contract Standard (ODCS) defines the keys and
+values of a contract written in YAML \cite{odcs2026}. Its sections cover fundamentals,
+schema, data quality, service-level agreements, infrastructure and servers, team and roles,
+and custom properties, among others. \todo{State the version used by the server (the
+contracts declare apiVersion v3.1.0) and the maintainer of the standard, from a primary
+source.}
+
+The contracts of the case use the custom properties to carry what the standard does not
+define: tags and retrieval context for agents, example questions, and a \texttt{semantics}
+block with the row grain, the dimension columns, the metrics with their quantity kind, unit
+and aggregation rules, and the aliases of coded values. Figure \todo{n} shows an excerpt.
 
 \section{Ontologies}
-\todo{T-Box and A-Box; RDF, OWL, SKOS. Vocabularies reused in this work: DCAT, RDF Data
-Cube, CSVW, QUDT. IEC CIM as the reference model for power systems.}
+An ontology is an explicit specification of the concepts of a domain and of the relations
+between them. \todo{Reference.} In the RDF family of languages, the schema-level statements
+(classes and properties) are called the T-Box and the statements about individuals the
+A-Box. This work reuses five vocabularies. DCAT is an RDF vocabulary designed to facilitate
+interoperability between data catalogues published on the Web, and is a W3C Recommendation
+since August 2024 in its third version \cite{dcat3}. The RDF Data Cube vocabulary, a W3C
+Recommendation of January 2014, describes multi-dimensional statistical data with measures
+and dimensions \cite{datacube}. SKOS provides labels and concept schemes, and CSVW describes
+tabular columns. \todo{References for SKOS and CSVW.} QUDT provides semantic specifications
+for units of measure, quantity kinds, dimensions and data types \cite{qudt}.
+
+For power systems, the Common Information Model (CIM) of the IEC defines classes such as
+substation, generating unit, hydro power plant and reservoir. \todo{Reference to IEC 61970.}
+The ontology of this work aligns its spatial entities to CIM classes with loose matches and
+keeps the concepts specific to the Brazilian system in its own namespace.
