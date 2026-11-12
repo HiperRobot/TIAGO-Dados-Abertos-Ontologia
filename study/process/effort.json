@@ -119,8 +119,9 @@
   }
  },
  "second_attempt": {
-  "commits": 3,
+  "commits": 4,
   "commit_log": [
+   "c53788c 2026-11-11 study: agent round results (Sonnet 5.5 on Bedrock), ontology MCP server, effort figures",
    "de21ac2 2026-11-11 study: agent round on Amazon Bedrock (LLM picks the dataset through tools)",
    "23ecb80 2026-11-11 study: routing harness on human-written questions, ontology JSON export, thesis skeleton",
    "94af8d4 2026-11-11 study: ontology v0.2 (T-Box + A-Box derived from the ODCS contracts) and fidelity ledger"
@@ -142,7 +143,7 @@
    "study/viz/render.py": 90
   },
   "python_lines_total": 1559,
-  "tbox_lines_hand_written": 165,
+  "tbox_lines_hand_written": 168,
   "abox_triples_generated": 39390,
   "hand_written_instance_data": 0
  }

@@ -24,9 +24,12 @@
 #     for controlled vocabularies, QUDT for quantity kinds and units.
 #  2. Domain concepts with no standard equivalent (subsystem, REE,
 #     EAR, ENA, CMO, MWmed, MWmes) live in the ons: namespace.
-#  3. Alignments to IEC CIM are skos:closeMatch only. The CIM class
-#     names and the namespace IRI below MUST be checked against the
-#     official CIM profile before publication (not yet verified).
+#  3. Alignments to IEC CIM are skos:closeMatch only. The seven CIM
+#     class names used below were checked against the CIM17 schema
+#     documentation on 2026-11-11. The namespace IRI was NOT confirmed
+#     and must be checked against the official profile. Note that
+#     cim:GeneratingUnit is a unit, not a whole plant: the match with
+#     ons:Usina is deliberately loose.
 #  4. The namespace https://w3id.org/tiago-ons/ is provisional.
 #################################################################
 

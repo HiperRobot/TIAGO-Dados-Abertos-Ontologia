@@ -2,59 +2,116 @@
 \label{ch:case}
 
 \section{Introduction}
-\todo{Why a case study: a contemporary phenomenon studied in its real context, where the
-boundary between the migration and the server cannot be controlled
-\cite{runeson2012case}. State the type: single case, exploratory and descriptive.}
+This chapter reports a case study conducted according to the guidelines of
+\citeonline{runeson2012case}. A case study fits the problem because the migration is a
+contemporary phenomenon that can only be observed inside a real system: the contracts, the
+server that consumes them and the questions asked by its users are not under the control of
+the researcher. The study is a single-case, descriptive and exploratory study. Its purpose
+is to characterise the migration, not to test a causal hypothesis; the experiments reported
+below are sources of evidence inside the case.
 
 \section{Goal and Research Questions}
 \label{sec:goal-rqs}
+The goal stated in Chapter 1 is refined into five research questions, one per metric group.
 \begin{description}[leftmargin=1cm]
 \item[RQ1 (Effort)] What steps, decisions and effort were required to derive the ontology from the data contracts?
 \item[RQ2 (Fidelity)] To what extent are the constructs of the data contracts represented in the ontology as typed knowledge, as opaque literals, or not at all?
-\item[RQ3 (Routing effectiveness)] How does dataset routing accuracy change when the server is fed by the contracts, by the ontology, or by both?
-\item[RQ4 (Answer correctness)] \todo{LLM round on Amazon Bedrock: execution accuracy and executable-but-wrong answers per condition. Not yet collected.}
-\item[RQ5 (Cost)] \todo{Context tokens delivered to the agent per condition. Not yet collected.}
+\item[RQ3 (Routing effectiveness)] How does the accuracy of the server's dataset router change when it is fed by the contracts, by the ontology, or by both?
+\item[RQ4 (Agent effectiveness)] How does the accuracy of an LLM-based agent in choosing the dataset change under the same conditions?
+\item[RQ5 (Cost)] How much context does the agent consume under each condition?
 \end{description}
 
 \section{Context and Case Selection}
 The case is TIAGO Dados Abertos, an open-source MCP server maintained by the Brazilian
-power system operator (ONS). At version 1.1.0 it describes 80 open datasets with 80 ODCS
-data contracts, 887 columns and 351 governed metrics. It exposes four tools
-(\texttt{buscar\_dataset}, \texttt{listar\_datasets}, \texttt{descrever\_dataset},
-\texttt{executar\_sql}); dataset routing combines BM25 with keyword rules.
-\todo{Role of the author in the organisation; why this case; manual item 5 (architecture
-figure and description of the system).}
+power system operator (ONS). At version 1.1.0 it describes 80 open datasets with 80 data
+contracts written in the Open Data Contract Standard, with 887 columns and 351 governed
+metrics. It exposes four tools (\texttt{buscar\_dataset}, \texttt{listar\_datasets},
+\texttt{descrever\_dataset}, \texttt{executar\_sql}); dataset routing combines BM25 with
+keyword rules over the contracts.
+
+The case was selected for three reasons. The contracts are unusually rich: besides schema,
+each one carries a \texttt{semantics} block with row grain, metric definitions and
+aggregation rules. The domain has quantities that cannot be aggregated in the same way
+(average power in MWmed, stored energy in MWmes), so a wrong answer can be silently
+plausible. And the author works at the organisation and had access to question sets written
+by its staff. \todo{Describe the author's role; add the architecture figure required by
+item 5 of the manual.}
 
 \section{Data Collection}
-\begin{itemize}[leftmargin=1.5cm]
-\item \textbf{Contracts and ontology.} The ontology schema (T-Box) was written by hand,
-reusing DCAT, RDF Data Cube, CSVW, SKOS and QUDT. Its content (A-Box, 39{,}390 triples) is
-generated from the contracts by a script that records every construct occurrence in a ledger.
-\item \textbf{Question sets.} Two sets written by ONS staff for an earlier system: a curated
-test battery (133 questions, of which 106 are usable for routing) and a selector benchmark
-(204 questions with exactly one correct dataset). \todo{Authorisation from ONS; provenance
-of the 204 set.}
-\item \textbf{Process records.} The log of the first, exploratory attempt made with an AI
-coding assistant: 1{,}025 logged events and 73 file snapshots over three working sessions
-(43, 22 and 8 snapshots), plus the version history of the second attempt.
-\end{itemize}
+\textbf{Contracts and ontology.} The ontology was built twice. A first, exploratory attempt
+with an AI coding assistant produced a small ontology with hand-curated aliases. It is kept
+as a tagged snapshot and is not used in the results. The second attempt, reported here,
+separates a hand-written schema (T-Box, 165 lines of Turtle) from generated content (A-Box).
+The schema reuses DCAT and Dublin Core for dataset metadata, RDF Data Cube for measures and
+dimensions, CSVW for columns, SKOS for controlled vocabularies and QUDT for quantity kinds
+and units. A generator reads the 80 contracts and emits 39{,}390 triples; no instance data
+is written by hand. Every construct occurrence found in a contract is recorded in a ledger
+with its level of representation.
+
+\textbf{Question sets.} Two sets written by ONS staff for an earlier question-answering
+system were used: a curated test battery with 133 questions, of which 106 are usable for
+routing (27 follow-up questions that depend on a previous turn and rows with no expected
+dataset were excluded), and a selector benchmark with 204 questions that have exactly one
+correct dataset. Neither set repeats a question indexed by the server. \todo{Record the
+authorisation from ONS and the provenance of the 204 set.}
+
+\textbf{Process records.} For the first attempt, the conversation log of the assistant and
+the file snapshots it kept; for the second, the version history of the study repository.
 
 \section{Analysis}
-\todo{RQ2: share of construct occurrences per level, and share carried by standard
-vocabularies. RQ3: top-1, top-3 and MRR with Wilson intervals; exact McNemar tests on paired
-top-1 outcomes with Holm correction; paired bootstrap for differences. The production router
-is never modified: only the catalogue it receives changes.}
+For RQ2, construct occurrences are classified as \emph{semantic} (a typed node or controlled
+concept linked in the graph), \emph{literal} (content preserved as opaque text, SQL or JSON),
+\emph{dropped}, or not applicable when the contract explicitly declares no value. The share
+carried by standard vocabularies is also reported.
+
+For RQ3, the production router is never modified; only the catalogue it receives changes.
+Five catalogues are compared: schema only, the contracts, the contracts with an ontology
+re-rank, and two catalogues rebuilt from the ontology graph, one with semantic content only
+and one with semantic and literal content. The re-rank moves members of a measure family at
+the grain named in the question ahead of their siblings and has no tunable weight. Top-1,
+top-3 and MRR are reported with 95\% Wilson intervals.
+
+For RQ4 and RQ5, a Claude Sonnet 5.5 model on Amazon Bedrock receives a search tool, a
+describe tool and a final-answer tool, all backed by the catalogue of the condition. The
+answer is correct when the chosen dataset is one of the valid ones. Input tokens per
+question measure the context cost. Sampling parameters cannot be set on this model, so the
+round is not deterministic; each condition was run once.
+
+Paired differences use the exact McNemar test with Holm correction, and paired bootstrap
+intervals with 10{,}000 resamples.
 
 \section{Results}
 
 \subsection{RQ1: Effort}
-\todo{Timeline of the two attempts, decisions, and what each attempt cost. First attempt:
-three sessions, hand-curated aliases, coverage of three contract constructs. Second attempt:
-generator of about 400 lines, no hand-written instance data.}
+Table~\ref{tab:effort} summarises the two attempts. In the first, the assistant log holds
+19 user prompts, 204 tool calls and 46 minutes of assistant time over four working days,
+with 73 intermediate versions of 26 files. Its outcome covered three contract constructs,
+and the phenomenon aliases were hand-tuned until coverage rose from 22 to 74 of 77 datasets.
+In the second, the mapping is a program: 1{,}277 lines of Python and 165 lines of schema.
+\todo{Add the person-time of the second attempt and the list of design decisions.}
+
+\begin{table}[ht]
+\centering\small
+\caption{Effort of the two attempts at deriving the ontology.}
+\label{tab:effort}
+\begin{tabular}{lrr}
+\toprule
+ & First attempt & Second attempt \\
+\midrule
+Contract construct types represented & 3 of 65 & 59 of 65 \\
+Hand-written instance data & partly & none \\
+Instance data & 77 dataset bindings & 39{,}390 triples \\
+Schema, hand-written lines & 254 & 165 \\
+File versions kept & 73 snapshots & \todo{n} commits \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{RQ2: Fidelity}
 Table~\ref{tab:fidelity} shows what happened to the 26{,}839 construct occurrences found in
-the 80 contracts (484 further occurrences are explicit ``no value'' markers and are left out).
+the 80 contracts; 484 further occurrences are explicit ``no value'' markers. More than half
+of the content became typed knowledge and 40\% was preserved as literals. What was dropped
+belongs to the physical layer and to contract housekeeping.
 
 \begin{table}[ht]
 \centering\small
@@ -77,18 +134,21 @@ Total & 15{,}189 (56.6\%) & 10{,}788 (40.2\%) & 862 (3.2\%) \\
 \end{tabular}
 \end{table}
 
-\todo{Vocabulary reuse: 13{,}480 of the 25{,}977 represented occurrences use a standard
-vocabulary. Only 14 of 45 units have a QUDT equivalent; MWmed, MWmes and R\$/MWh do not.
-Inconsistencies surfaced by the migration (domain and unit spellings, aggregation names).}
+Of the 25{,}977 represented occurrences, 13{,}480 (51.9\%) are carried by a standard
+vocabulary. Units show the limit of reuse: only 14 of the 45 units found in the contracts
+have a QUDT equivalent, and the units specific to the Brazilian sector (MWmed, MWmes,
+R\$/MWh) do not. The migration also surfaced inconsistencies that the contracts tolerate:
+the same domain written with and without accents, two spellings of the same unit, and two
+names for the same aggregation.
 
 \subsection{RQ3: Routing effectiveness}
 \begin{table}[ht]
 \centering\small
-\caption{Top-1 routing accuracy (95\% Wilson interval) on the two human-written question sets.}
+\caption{Top-1 accuracy of the server's router (95\% Wilson interval).}
 \label{tab:routing}
 \begin{tabular}{lcc}
 \toprule
-Catalogue given to the router & Battery v2 ($n=106$) & Selector set ($n=204$) \\
+Catalogue given to the router & Battery ($n=106$) & Selector set ($n=204$) \\
 \midrule
 Schema only & 0.330 [0.25, 0.42] & 0.382 [0.32, 0.45] \\
 Contracts (production) & 0.679 [0.59, 0.76] & 0.750 [0.69, 0.80] \\
@@ -99,26 +159,87 @@ Ontology, semantic and literal content & 0.679 [0.59, 0.76] & 0.750 [0.69, 0.80]
 \end{tabular}
 \end{table}
 
-\todo{Reading. (i) The ontology with all content reproduces the contracts exactly: no
-discordant question in either set. (ii) Semantic content alone loses 5 to 8 points; the
-difference is significant only on the larger set (Holm-adjusted $p=0.035$). (iii) The
-family-grain re-rank changes one question in each set, in opposite directions. (iv) Hard
-questions remain at 0.40 under every condition.}
+The catalogue rebuilt from the full ontology reproduces the contracts: no question is routed
+differently in either set. With semantic content only, accuracy drops by 5 to 8 points; the
+difference is significant on the larger set (Holm-adjusted $p=0.035$) and not on the battery
+($p=0.44$). The re-rank changes one answer in each set, in opposite directions. On the
+questions rated hard in the battery, accuracy is at most 0.40 under every condition.
 
-\subsection{RQ4: Answer correctness}
-\todo{Pending the LLM round.}
+\subsection{RQ4: Agent effectiveness}
+\begin{table}[ht]
+\centering\small
+\caption{Accuracy of the LLM-based agent in choosing the dataset (95\% Wilson interval) and
+mean input tokens per question.}
+\label{tab:agent}
+\begin{tabular}{lcrcr}
+\toprule
+ & \multicolumn{2}{c}{Battery ($n=106$)} & \multicolumn{2}{c}{Selector set ($n=204$)} \\
+Catalogue behind the tools & Accuracy & Tokens & Accuracy & Tokens \\
+\midrule
+Schema only & 0.660 [0.57, 0.74] & 3{,}999 & 0.838 [0.78, 0.88] & 3{,}624 \\
+Contracts & 0.858 [0.78, 0.91] & 6{,}777 & 0.912 [0.87, 0.94] & 6{,}117 \\
+Ontology, semantic only & 0.868 [0.79, 0.92] & 4{,}460 & 0.917 [0.87, 0.95] & 4{,}100 \\
+Ontology, semantic and literal & 0.877 [0.80, 0.93] & 5{,}016 & 0.912 [0.87, 0.94] & 4{,}848 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The agent is far more accurate than the router alone, and the semantic layers still matter:
+contracts add 20 points over schema on the battery and 7 on the selector set (Holm-adjusted
+$p<0.01$ in both). Between contracts and either ontology catalogue there is no detectable
+difference in accuracy: at most seven discordant questions in any comparison, and no adjusted $p$ below 1. With
+schema only, the agent gives no answer for 12\% of the battery questions; with any semantic
+layer, for at most 2\%.
 
 \subsection{RQ5: Cost}
-\todo{Pending.}
+The semantic-only ontology catalogue delivers the accuracy of the contracts with about a
+third less context: 2{,}317 fewer input tokens per question on the battery (95\% interval
+1{,}145 to 3{,}587) and 2{,}017 fewer on the selector set (1{,}199 to 2{,}913). The whole
+round consumed 6.0 million input tokens and 0.23 million output tokens.
 
 \section{Discussion and Lessons Learned}
-\todo{An ontology derived from complete contracts is a lossless carrier for routing, so its
-value must come from what contracts cannot express. Free text and example questions carry
-5 to 8 points of routing accuracy. The first attempt failed because it kept structure and
-dropped vocabulary.}
+\textbf{A generated ontology is a lossless carrier, so its value lies elsewhere.} Because
+every routing-relevant construct was migrated, the full ontology behaves exactly like the
+contracts. An ontology derived from complete contracts cannot beat them on a task the
+contracts already support; it can only match them, reorganise them, or expose what they lack.
+
+\textbf{Vocabulary matters more than structure.} The first attempt kept three structural
+axes and dropped the vocabulary, and its ontology-only condition routed worse than a plain
+schema. The second attempt carries labels and aliases as typed annotations and routes close
+to the contracts without any free text.
+
+\textbf{An agent needs less text than a lexical router.} Free text and example questions are
+worth 5 to 8 points to the BM25 router and nothing measurable to the agent, which reaches the
+same accuracy on typed content with a third less context.
+
+\textbf{The migration works as an audit of the contracts.} Normalising values exposed
+inconsistent spellings, and typing the grain exposed contracts that declare no entity where
+one exists (the equivalent-reservoir datasets are typed at subsystem grain).
+
+\textbf{Cross-dataset knowledge did not help routing.} The family-grain re-rank, the one
+mechanism that uses knowledge absent from individual contracts, was neutral.
 
 \section{Threats to Validity}
-\todo{Construct, internal, external and reliability, following \citeonline{runeson2012case}.}
+\textbf{Construct validity.} Choosing the right dataset is a necessary step, not the final
+answer; neither the SQL nor the returned value was evaluated. The fidelity levels depend on
+mapping decisions made by the author, which are explicit in the generator. The questions
+were written for another system and their expected datasets reflect that system's catalogue.
+
+\textbf{Internal validity.} The ontology content comes from the same contracts it is
+compared with, which bounds what it can add. The agent round was run once per condition on a
+non-deterministic model. The question sets had already been used to evaluate the first attempt when the second
+ontology was designed: the generator has no parameter fitted to them, but the design was
+not blind to those results.
+
+\textbf{External validity.} One organisation, one catalogue of 80 datasets, questions in
+Portuguese, one router and one model. The contracts are richer than usual, which favours the
+contracts condition and may not hold elsewhere.
+
+\textbf{Reliability.} Code, ontology, ledger and aggregate results are public in the study
+repository, pinned to a corpus commit. The question sets and the assistant log are not
+public; the scripts that convert them are. The names of the IEC CIM classes used in the
+alignments were checked against the CIM17 schema documentation; the namespace IRI was not. Much of the code was produced with AI assistants under the author's
+direction.
 
 \section{Concluding Remarks}
-\todo{}
+\todo{Two or three sentences closing the chapter.}
