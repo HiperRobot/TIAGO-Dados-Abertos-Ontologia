@@ -1,0 +1,527 @@
+<title>Grafo da Ontologia ONS</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
+<style>
+/* Layout: one-screen app. Toolbar on top, graph canvas on the left, a reading panel on the right (stacked on phones). */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#13203a; --muted:#5a667d; --line:#dde2ea; --dim:#c9cfda; --edge:#9aa5b8;
+  --accent:#1f6f8b; --warn:#b03a2e; --hl:#e8a33d;
+  --c-dataset:#1f6f8b; --c-metric:#d1782a; --c-dimension:#8a6bc9; --c-entity:#2e8b57; --c-family:#c2477a;
+  --c-domain:#4a63c8; --c-perspective:#6d7f2e; --c-qkind:#b8860b; --c-unit:#9c6b3a; --c-aggregation:#7a8699;
+  --c-usecase:#3d9aa1; --c-status:#8e8e8e; --c-column:#5f87a6; --c-template:#a25ca8; --c-alias:#7aa36a;
+  --display:'Space Grotesk','Segoe UI',Arial,sans-serif; --text:'Inter','Segoe UI',Arial,sans-serif; --mono:'JetBrains Mono',Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1320; --surface:#151e30; --ink:#e7ebf3; --muted:#9ea9bf; --line:#27324a; --dim:#2a3550; --edge:#4c5a78;
+  --accent:#6cc3df; --warn:#f08a7e; --hl:#f2b75b;
+  --c-dataset:#5fb8d9; --c-metric:#f09a52; --c-dimension:#b39bf0; --c-entity:#5fc98d; --c-family:#ee77a8;
+  --c-domain:#8197f0; --c-perspective:#b3c75a; --c-qkind:#e3b84a; --c-unit:#d29a66; --c-aggregation:#a7b2c6;
+  --c-usecase:#6cc9cf; --c-status:#a9a9a9; --c-column:#8fb4d1; --c-template:#cf8fd4; --c-alias:#a5cf95; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0d1320; --surface:#151e30; --ink:#e7ebf3; --muted:#9ea9bf; --line:#27324a; --dim:#2a3550; --edge:#4c5a78;
+  --accent:#6cc3df; --warn:#f08a7e; --hl:#f2b75b;
+  --c-dataset:#5fb8d9; --c-metric:#f09a52; --c-dimension:#b39bf0; --c-entity:#5fc98d; --c-family:#ee77a8;
+  --c-domain:#8197f0; --c-perspective:#b3c75a; --c-qkind:#e3b84a; --c-unit:#d29a66; --c-aggregation:#a7b2c6;
+  --c-usecase:#6cc9cf; --c-status:#a9a9a9; --c-column:#8fb4d1; --c-template:#cf8fd4; --c-alias:#a5cf95; color-scheme:dark }
+html,body{height:100%}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:14px;line-height:1.45;margin:0;
+  padding-left:max(0px,env(safe-area-inset-left,0px));padding-right:max(0px,env(safe-area-inset-right,0px))}
+.app{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);}
+.bar{display:flex;flex-direction:column;gap:8px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));
+  background:var(--surface);border-bottom:1px solid var(--line)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:0}
+h1{font-family:var(--display);font-size:18px;margin:0;white-space:nowrap}
+.mode{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.mode button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:13px;padding:5px 10px;cursor:pointer}
+.mode button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.search{position:relative;flex:1 1 220px;max-width:380px;min-width:0}
+.search input{width:100%;font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+.results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;z-index:20;
+  max-height:320px;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.results button{display:flex;gap:8px;align-items:center;width:100%;text-align:left;border:0;background:transparent;color:var(--ink);font:inherit;padding:7px 10px;cursor:pointer}
+.results button:hover,.results button:focus{background:var(--bg);outline:none}
+.sw{flex:none;width:10px;height:10px;border-radius:50%}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:3px 9px;font-size:12px;
+  background:var(--surface);color:var(--ink);cursor:pointer;font-family:var(--text)}
+.chip[aria-pressed="false"]{color:var(--muted);opacity:.55}
+.chip .n{color:var(--muted);font-variant-numeric:tabular-nums}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;border-radius:8px;padding:5px 10px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--hl);outline-offset:1px}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;min-height:0}
+.stage{position:relative;min-width:0;min-height:0}
+canvas{display:block;width:100%;height:100%;cursor:grab}
+canvas.hover{cursor:pointer}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;max-width:300px;
+  box-shadow:0 6px 18px rgba(0,0,0,.16);font-size:12px;z-index:5}
+.tip b{font-family:var(--display);font-size:14px;display:block}
+.hint{position:absolute;left:12px;bottom:12px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;max-width:calc(100% - 24px)}
+.zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:4px}
+.zoom .btn{width:34px;height:34px;padding:0;font-size:16px}
+aside.panel{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:16px 18px 32px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.ptype{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ptitle{font-family:var(--display);font-size:22px;line-height:1.15;margin:4px 0 2px;word-break:break-word;text-wrap:balance}
+.pid{font-family:var(--mono);font-size:11px;color:var(--muted);word-break:break-all}
+.sec{display:flex;flex-direction:column;gap:6px}
+.sec h3{font-family:var(--display);font-size:13px;margin:0;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.sec p{margin:0}
+.box{background:var(--bg);border-radius:8px;padding:10px 12px}
+dl{margin:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+dt{font-size:12px;color:var(--muted);font-weight:600}
+dd{margin:0;word-break:break-word;white-space:pre-wrap}
+dd code,pre{font-family:var(--mono);font-size:11.5px}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;background:var(--bg);border-radius:6px;padding:8px}
+.rel{display:flex;flex-direction:column;gap:4px}
+.rel .lab{font-size:12px;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:5px}
+.lk{display:inline-flex;gap:5px;align-items:center;border:1px solid var(--line);border-radius:6px;padding:2px 7px;font-size:12px;background:var(--surface);color:var(--ink);cursor:pointer;font-family:var(--text);max-width:100%}
+.lk span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lk:hover{border-color:var(--accent)}
+.lk.warn{border-color:var(--warn);color:var(--warn)}
+.fbar{display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--dim)}
+.fbar i{display:block;height:100%}
+.flegend{display:flex;gap:12px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+table{border-collapse:collapse;width:100%;font-size:12px;font-variant-numeric:tabular-nums}
+th,td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:600}
+textarea{width:100%;min-height:72px;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);resize:vertical}
+.note{border:1px solid var(--line);border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:4px}
+.note .meta{font-size:11px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.note .meta button{border:0;background:transparent;color:var(--muted);cursor:pointer;font:inherit;font-size:11px;text-decoration:underline}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+@media (max-width:860px){
+  .app{height:auto;min-height:100%}
+  .main{grid-template-columns:minmax(0,1fr)}
+  .stage{height:62vh}
+  aside.panel{border-left:0;border-top:1px solid var(--line)}
+  .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <div class="bar">
+    <div class="row">
+      <h1>Grafo da ontologia</h1>
+      <div class="mode" role="group" aria-label="Visão">
+        <button id="m-inst" aria-pressed="true">Instâncias</button>
+        <button id="m-schema" aria-pressed="false">Esquema</button>
+      </div>
+      <div class="search">
+        <input id="q" type="search" placeholder="Buscar: carga, MWmed, subsistema, EAR…" autocomplete="off" aria-label="Buscar no grafo">
+        <div class="results" id="results" hidden></div>
+      </div>
+      <button class="btn" id="notesBtn" hidden>Notas para o Claude (<span id="notesN">0</span>)</button>
+    </div>
+    <div class="row">
+      <div class="chips" id="chips" aria-label="Tipos visíveis"></div>
+    </div>
+    <div class="row">
+      <div class="chips" id="overlays" aria-label="Ligações extras"></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Grafo da ontologia: clique em um nó para ver o que ele significa"></canvas>
+      <div class="tip" id="tip" hidden></div>
+      <div class="hint" id="hint">Passe o mouse para ver, clique para abrir, arraste para mover. Roda do mouse aproxima.</div>
+      <div class="zoom"><button class="btn" id="zin" aria-label="Aproximar">+</button><button class="btn" id="zout" aria-label="Afastar">−</button><button class="btn" id="zfit" aria-label="Enquadrar tudo">⤢</button></div>
+    </div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script id="graph-data" type="application/json">/*GRAPH_DATA*/</script>
+<script>
+(() => {
+const G = JSON.parse(document.getElementById('graph-data').textContent);
+
+// ---------- vocabulary of the page ----------
+const TYPES = {
+  dataset:{n:'Conjunto de dados', cls:'ons:Dataset ⊑ dcat:Dataset', what:'Uma tabela de dados aberta publicada pelo ONS. É o que o agente precisa escolher para responder a uma pergunta; tudo o mais no grafo existe para ajudar nessa escolha e no uso correto do dado.', from:'Cabeçalho do contrato ODCS (fundamentals, description) e customProperties: tags, contexto de recuperação, perguntas de exemplo.'},
+  metric:{n:'Métrica', cls:'ons:Metric ⊑ qb:MeasureProperty', what:'Um valor numérico que o conjunto mede, com a grandeza física, a unidade e as regras de agregação. É aqui que mora a regra que impede somar MWmed ao longo do tempo.', from:'customProperties.semantics.metrics do contrato.'},
+  dimension:{n:'Dimensão', cls:'ons:Dimension ⊑ qb:DimensionProperty', what:'Um eixo pelo qual o dado pode ser aberto ou filtrado, como subsistema ou usina, ligado ao tipo de entidade do setor elétrico a que se refere.', from:'customProperties.semantics.dimensions do contrato.'},
+  entity:{n:'Entidade do setor', cls:'ons:SpatialEntityType', what:'Um tipo de coisa do sistema elétrico (SIN, subsistema, usina, reservatório…), com a hierarquia parte-de entre eles. É a parte da ontologia escrita à mão e o único conhecimento que atravessa conjuntos de dados.', from:'Escrito à mão no esquema da ontologia (tbox.ttl), alinhado ao IEC CIM por correspondência aproximada.'},
+  family:{n:'Família de medidas', cls:'ons:Family ⊑ skos:Concept', what:'Conjuntos que medem a mesma coisa em grãos diferentes (por exemplo carga diária, mensal, por subsistema). Irmãos de família são a principal fonte de confusão do agente.', from:'customProperties.semantics.family do contrato.'},
+  domain:{n:'Domínio', cls:'ons:Domain ⊑ skos:Concept', what:'Área de negócio do conjunto (carga, geração, hidrologia…).', from:'Domínio declarado no contrato.'},
+  perspective:{n:'Perspectiva temporal', cls:'ons:Perspective ⊑ skos:Concept', what:'Se o dado é verificado (aconteceu), programado, previsto ou cadastral.', from:'customProperties.semantics.temporal_perspective.'},
+  qkind:{n:'Grandeza física', cls:'ons:QuantityKind ⊑ skos:Concept', what:'O tipo de quantidade de uma métrica (potência média, energia, vazão…), alinhado ao vocabulário QUDT quando existe correspondência.', from:'quantity_kind das métricas, normalizado na migração.'},
+  unit:{n:'Unidade', cls:'ons:Unit ⊑ skos:Concept', what:'Unidade de medida (MWmed, MWh, m³/s…). Grafias diferentes da mesma unidade nos contratos foram unificadas aqui.', from:'unit_native das métricas e unidades das colunas, normalizadas.'},
+  aggregation:{n:'Agregação', cls:'ons:Aggregation ⊑ skos:Concept', what:'Função de agregação (soma, média, máximo…). Uma métrica tem uma agregação padrão e pode ter agregações proibidas.', from:'default e forbidden_aggregations das métricas.'},
+  usecase:{n:'Uso de consulta', cls:'ons:UseCase ⊑ skos:Concept', what:'Tipo de pergunta que o conjunto atende ou não atende (série temporal, ranking, listagem…).', from:'customProperties.semantics.query_routing.'},
+  status:{n:'Situação', cls:'ons:Status ⊑ skos:Concept', what:'Se o conjunto está ativo ou descontinuado.', from:'status do contrato.'},
+  column:{n:'Coluna', cls:'ons:Column ⊑ csvw:Column', what:'Uma coluna física da tabela, com tipo, papel e valores permitidos.', from:'schema.properties do contrato.'},
+  template:{n:'Consulta pronta', cls:'ons:QueryTemplate', what:'Um SQL de referência para uma pergunta típica, ligado à métrica que usa. Fica guardado como texto: a ontologia sabe que existe, não entende o SQL.', from:'customProperties.semantics.sql_patterns.'},
+  alias:{n:'Apelido de valor', cls:'ons:ValueAlias', what:'Como as pessoas chamam um código do dado (\"sudeste\" para SE) e o filtro SQL que o seleciona.', from:'customProperties.semantics.value_aliases.'},
+};
+const DETAIL = new Set(['column','template','alias']);
+const DEFAULT_OFF = new Set(['column','template','alias','usecase','status']);
+const REL = { // kind: [from the source, from the target]
+  inDomain:['é do domínio','conjuntos do domínio'], inFamily:['é da família','membros da família'],
+  perspective:['perspectiva','conjuntos com esta perspectiva'], grain:['grão espacial','conjuntos neste grão'],
+  rowEntity:['cada linha é um(a)','conjuntos com uma linha por'], status:['situação','conjuntos nesta situação'],
+  supports:['atende','atendido por'], notSupports:['não atende','não atendido por'],
+  hasMetric:['mede','medida no conjunto'], qkind:['grandeza','métricas desta grandeza'], unit:['unidade','usado por'],
+  aggregation:['agrega por padrão com','padrão de'], forbidden:['nunca agregar com','proibida para'],
+  hasDimension:['abre por','dimensão de'], refersTo:['refere-se a','dimensões que se referem a ela'],
+  onColumn:['na coluna','coluna da dimensão'], hasColumn:['tem a coluna','coluna de'], computedFrom:['calculada de','usada no cálculo de'],
+  hasTemplate:['tem a consulta','consulta de'], usesMetric:['usa a métrica','usada nas consultas'], hasAlias:['valores com apelido','apelido de'],
+  partOf:['é parte de','tem como partes'], similar:['vocabulário parecido com','vocabulário parecido com'],
+  confused:['o agente trocou por','o agente escolheu no lugar de'],
+};
+const OVERLAYS = {
+  similar:{n:'Vocabulário parecido', on:true, tip:'Liga conjuntos que compartilham muitos sinônimos e palavras-chave (Jaccard ≥ 0,12, três vizinhos por conjunto).'},
+  confused:{n:'Confusões do agente', on:false, tip:'Liga o conjunto esperado ao escolhido por engano, somando os três modelos nas condições com contratos ou ontologia. Só pares com 2 ou mais erros.'},
+  notSupports:{n:'Usos não atendidos', on:false, tip:'Mostra também as ligações \"não atende\" para tipos de consulta.'},
+};
+const COND = {schema:'Só esquema', contracts:'Contratos', onto_sem:'Ont. semântica', onto_full:'Ont. completa'};
+
+// ---------- data structures ----------
+const byId = new Map(G.nodes.map(n => [n.id, n]));
+const allEdges = G.edges.map(([s,t,k]) => { const [kind,w] = k.split(':'); return {s, t, kind, w: w ? +w : null}; });
+const adj = new Map(G.nodes.map(n => [n.id, []]));
+for (const e of allEdges){ adj.get(e.s).push(e); adj.get(e.t).push(e); }
+for (const n of G.nodes){ n.deg = adj.get(n.id).filter(e => !DETAIL.has(byId.get(e.s===n.id?e.t:e.s).t)).length; }
+const counts = {}; for (const n of G.nodes) counts[n.t] = (counts[n.t]||0)+1;
+
+// schema-level graph: one node per type, edges aggregated by (type, kind, type)
+const schemaNodes = Object.keys(TYPES).filter(t => counts[t]).map(t => ({id:'T:'+t, t, l:TYPES[t].n, schema:true, cnt:counts[t]}));
+const agg = new Map();
+for (const e of allEdges){
+  if (e.kind==='similar'||e.kind==='confused') continue;
+  const a = byId.get(e.s).t, b = byId.get(e.t).t, key = a+'|'+e.kind+'|'+b;
+  agg.set(key, (agg.get(key)||0)+1);
+}
+const schemaEdges = [...agg].map(([k,c]) => { const [a,kind,b] = k.split('|'); return {s:'T:'+a, t:'T:'+b, kind, w:c}; }).filter(e => e.s!==e.t || true);
+for (const n of schemaNodes) byId.set(n.id, n);
+
+// ---------- state ----------
+const state = { mode:'inst', types:new Set(Object.keys(TYPES).filter(t => !DEFAULT_OFF.has(t))), overlays:new Set(Object.keys(OVERLAYS).filter(k=>OVERLAYS[k].on)),
+  expanded:new Set(), selected:null, hover:null, notes:[] };
+let sim, view = {nodes:[], links:[]}, transform = d3.zoomIdentity;
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d'), stage = document.getElementById('stage');
+const tip = document.getElementById('tip'), panel = document.getElementById('panel');
+let colors = {};
+function readColors(){
+  const cs = getComputedStyle(document.documentElement);
+  colors = {}; for (const t of Object.keys(TYPES)) colors[t] = cs.getPropertyValue('--c-'+t).trim();
+  for (const k of ['ink','muted','edge','dim','surface','bg','hl','warn','accent','line']) colors[k] = cs.getPropertyValue('--'+k).trim();
+}
+readColors();
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { readColors(); draw(); renderChips(); });
+new MutationObserver(() => { readColors(); draw(); }).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+
+// ---------- building the visible graph ----------
+function visibleSet(){
+  if (state.mode==='schema') return {nodes:schemaNodes, links:schemaEdges};
+  const vis = new Set();
+  for (const n of G.nodes) if (state.types.has(n.t)) vis.add(n.id);
+  for (const id of state.expanded){ vis.add(id); for (const e of adj.get(id)){ const o = e.s===id?e.t:e.s; if (DETAIL.has(byId.get(o).t)) { vis.add(o); for (const e2 of adj.get(o)){ const o2 = e2.s===o?e2.t:e2.s; if (byId.get(o2).t==='alias') vis.add(o2);} } } }
+  if (state.selected && byId.has(state.selected) && !state.selected.startsWith('T:')) vis.add(state.selected);
+  const links = allEdges.filter(e => vis.has(e.s) && vis.has(e.t) &&
+     (e.kind==='similar'||e.kind==='confused'||e.kind==='notSupports' ? state.overlays.has(e.kind) : true));
+  return {nodes:[...vis].map(id => byId.get(id)), links};
+}
+function radius(n){
+  if (n.schema) return 8 + Math.sqrt(n.cnt)*1.6;
+  const base = {dataset:7, entity:8, family:6, domain:6, qkind:5, unit:4, metric:3.2, dimension:3.2, aggregation:5, perspective:5, usecase:5, status:5, column:2.6, template:2.6, alias:2.2}[n.t]||3;
+  return base + Math.min(10, Math.sqrt(n.deg||0)*0.55);
+}
+function rebuild(keepAlpha){
+  const v = visibleSet();
+  const prev = new Map(view.nodes.map(n => [n.id, n]));
+  const nodes = v.nodes.map(n => { const p = prev.get(n.id); if (p) return p; const o = Object.assign(Object.create(n), {}); o.id = n.id; o.r = radius(n);
+     // start a newly shown detail node near its anchor
+     const anchor = adj.get(n.id)?.map(e => prev.get(e.s===n.id?e.t:e.s)).find(Boolean); if (anchor){ o.x = anchor.x + (Math.random()-.5)*30; o.y = anchor.y + (Math.random()-.5)*30; }
+     return o; });
+  const nm = new Map(nodes.map(n => [n.id, n]));
+  const links = v.links.map(e => ({source:nm.get(e.s), target:nm.get(e.t), kind:e.kind, w:e.w}));
+  view = {nodes, links, map:nm};
+  if (sim) sim.stop();
+  const schema = state.mode==='schema';
+  sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d=>d.id).distance(l => schema ? 150 : (l.kind==='similar'?70: l.kind==='confused'?90 : DETAIL.has(l.target.t)||DETAIL.has(l.source.t) ? 18 : l.kind==='hasMetric'||l.kind==='hasDimension'?26:45))
+        .strength(l => schema ? .5 : l.kind==='similar'? .08*(l.w||.2)*4 : l.kind==='confused'? .05 : (['qkind','unit','aggregation','supports','status','perspective','forbidden','inDomain'].includes(l.kind) ? .03 : .5)))
+    .force('charge', d3.forceManyBody().strength(n => schema ? -900 : -18 - n.r*4).distanceMax(schema?900:380))
+    .force('collide', d3.forceCollide(n => n.r + 1.5))
+    .force('x', d3.forceX(0).strength(schema?.02:.035)).force('y', d3.forceY(0).strength(schema?.02:.035))
+    .alphaDecay(.03).on('tick', draw);
+  if (!keepAlpha){ sim.stop(); for (let i=0;i<220;i++) sim.tick(); fit(false); sim.alpha(.08).restart(); }
+  else sim.alpha(.5).restart();
+}
+
+// ---------- drawing ----------
+function size(){
+  const r = stage.getBoundingClientRect(), dpr = window.devicePixelRatio||1;
+  cv.width = Math.max(1, r.width*dpr); cv.height = Math.max(1, r.height*dpr); cv.style.width = r.width+'px'; cv.style.height = r.height+'px';
+  draw();
+}
+function neighborsOf(id){ const s = new Set([id]); for (const l of view.links){ if (l.source.id===id) s.add(l.target.id); if (l.target.id===id) s.add(l.source.id);} return s; }
+function draw(){
+  if (!view.nodes.length) return;
+  const dpr = window.devicePixelRatio||1, w = cv.width, h = cv.height;
+  ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,w,h);
+  ctx.setTransform(dpr*transform.k,0,0,dpr*transform.k, dpr*transform.x + w/2, dpr*transform.y + h/2);
+  const focus = state.hover || state.selected;
+  const nb = focus && view.map.has(focus) ? neighborsOf(focus) : null;
+  const k = transform.k;
+  // links
+  for (const l of view.links){
+    const on = !nb || (nb.has(l.source.id) && nb.has(l.target.id) && (l.source.id===focus || l.target.id===focus));
+    ctx.globalAlpha = on ? (nb ? .9 : (l.kind==='similar'?.35:.28)) : .05;
+    ctx.strokeStyle = l.kind==='forbidden'||l.kind==='notSupports'||l.kind==='confused' ? colors.warn : l.kind==='similar' ? colors.accent : colors.edge;
+    ctx.lineWidth = (l.kind==='confused' ? Math.min(4,.6+l.w*.35) : state.mode==='schema' ? Math.min(6,.5+Math.log2(1+l.w)*.7) : .6)/Math.sqrt(k);
+    ctx.setLineDash(l.kind==='similar'||l.kind==='notSupports' ? [3/k,3/k] : []);
+    ctx.beginPath(); ctx.moveTo(l.source.x,l.source.y); ctx.lineTo(l.target.x,l.target.y); ctx.stroke();
+    if ((l.kind==='confused' || state.mode==='schema') && on){ arrow(l); }
+  }
+  ctx.setLineDash([]);
+  // nodes
+  for (const n of view.nodes){
+    const on = !nb || nb.has(n.id);
+    ctx.globalAlpha = on ? 1 : .12;
+    ctx.fillStyle = colors[n.t]||colors.muted;
+    ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,2*Math.PI); ctx.fill();
+    if (n.id===state.selected){ ctx.lineWidth = 2.5/k; ctx.strokeStyle = colors.hl; ctx.stroke(); }
+    else if (noteIds.has(n.id)){ ctx.lineWidth = 1.5/k; ctx.strokeStyle = colors.ink; ctx.stroke(); }
+  }
+  // labels
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const n of view.nodes){
+    const isFocus = nb && nb.has(n.id);
+    const show = state.mode==='schema' || isFocus || (!nb && (n.r*k > 9 || (k>2.2 && !DETAIL.has(n.t)) || k>4));
+    if (!show) continue;
+    ctx.globalAlpha = nb && !isFocus ? .1 : 1;
+    const fs = (state.mode==='schema'?13:Math.max(10, Math.min(13, 8+n.r*.5)))/k;
+    ctx.font = `${n.t==='dataset'||n.schema?600:400} ${fs}px Inter, Segoe UI, Arial, sans-serif`;
+    let label = state.mode==='schema' ? `${n.l} (${n.cnt})` : n.l; if (label.length>34) label = label.slice(0,32)+'…';
+    ctx.lineWidth = 3/k; ctx.strokeStyle = colors.bg; ctx.strokeText(label, n.x, n.y+n.r+2/k);
+    ctx.fillStyle = colors.ink; ctx.fillText(label, n.x, n.y+n.r+2/k);
+  }
+  ctx.globalAlpha = 1;
+}
+function arrow(l){
+  const a = Math.atan2(l.target.y-l.source.y, l.target.x-l.source.x), r = l.target.r+2, k = transform.k;
+  const x = l.target.x - Math.cos(a)*r, y = l.target.y - Math.sin(a)*r, s = 6/Math.sqrt(k);
+  ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x-s*Math.cos(a-.4), y-s*Math.sin(a-.4)); ctx.lineTo(x-s*Math.cos(a+.4), y-s*Math.sin(a+.4)); ctx.closePath();
+  ctx.fillStyle = ctx.strokeStyle; ctx.fill();
+}
+
+// ---------- interaction ----------
+const zoom = d3.zoom().scaleExtent([.08, 12])
+  .filter(ev => (ev.type==='wheel' || (!ev.ctrlKey && !ev.button)) && (ev.type==='wheel' || ev.type==='dblclick' || !pick(ev)))
+  .on('zoom', ev => { transform = ev.transform; draw(); });
+const sel = d3.select(cv);
+function toGraph(ev){ const p = ev.touches && ev.touches[0] ? ev.touches[0] : (ev.changedTouches && ev.changedTouches[0]) || ev; const r = cv.getBoundingClientRect(); return [(p.clientX - r.left - r.width/2 - transform.x)/transform.k, (p.clientY - r.top - r.height/2 - transform.y)/transform.k]; }
+function pick(ev){ const [x,y] = toGraph(ev); let best=null, bd=Infinity; for (const n of view.nodes){ const d = Math.hypot(n.x-x, n.y-y); if (d < n.r + 4/transform.k && d < bd){ bd=d; best=n; } } return best; }
+let dragging = null;
+d3.select(cv).call(d3.drag().container(cv)
+  .subject(ev => { const n = pick(ev.sourceEvent); return n || undefined; })
+  .on('start', ev => { dragging = ev.subject; if (!ev.active) sim.alphaTarget(.2).restart(); ev.subject.fx = ev.subject.x; ev.subject.fy = ev.subject.y; })
+  .on('drag', ev => { const [x,y] = toGraph(ev.sourceEvent); ev.subject.fx = x; ev.subject.fy = y; })
+  .on('end', ev => { if (!ev.active) sim.alphaTarget(0); ev.subject.fx = null; ev.subject.fy = null; dragging = null; }));
+sel.call(zoom).on('dblclick.zoom', null);
+cv.addEventListener('mousemove', ev => {
+  if (dragging) return;
+  const n = pick(ev); const id = n ? n.id : null;
+  cv.classList.toggle('hover', !!n);
+  if (id !== state.hover){ state.hover = id; draw(); }
+  if (n){ const r = stage.getBoundingClientRect(); tip.hidden = false; tip.innerHTML = tipHTML(n);
+    const x = ev.clientX - r.left + 14, y = ev.clientY - r.top + 14; tip.style.left = Math.min(x, r.width - tip.offsetWidth - 8)+'px'; tip.style.top = Math.min(y, r.height - tip.offsetHeight - 8)+'px'; }
+  else tip.hidden = true;
+});
+cv.addEventListener('mouseleave', () => { state.hover = null; tip.hidden = true; draw(); });
+cv.addEventListener('click', ev => { const n = pick(ev); if (n) select(n.id); else if (state.selected){ state.selected = null; renderPanel(); draw(); } });
+document.getElementById('zin').onclick = () => sel.transition().duration(250).call(zoom.scaleBy, 1.5);
+document.getElementById('zout').onclick = () => sel.transition().duration(250).call(zoom.scaleBy, 1/1.5);
+document.getElementById('zfit').onclick = () => fit(true);
+function fit(anim){
+  const xs = view.nodes.map(n=>n.x), ys = view.nodes.map(n=>n.y); if (!xs.length) return;
+  const r = stage.getBoundingClientRect(), x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const k = Math.min(4, .9*Math.min(r.width/Math.max(1,x1-x0), r.height/Math.max(1,y1-y0)));
+  const t = d3.zoomIdentity.translate(-k*(x0+x1)/2, -k*(y0+y1)/2).scale(k);
+  (anim ? sel.transition().duration(400) : sel).call(zoom.transform, t);
+}
+function centerOn(id){
+  const n = view.map.get(id); if (!n) return;
+  const k = Math.max(transform.k, 1.4);
+  sel.transition().duration(450).call(zoom.transform, d3.zoomIdentity.translate(-k*n.x, -k*n.y).scale(k));
+}
+function select(id, center){
+  const n = byId.get(id); if (!n) return;
+  if (state.mode==='inst' && !n.schema && !view.map.has(id)){
+    if (DETAIL.has(n.t)){ const owner = adj.get(id).map(e => e.s===id?e.t:e.s).find(o => !DETAIL.has(byId.get(o).t)) || adj.get(id).map(e => e.s===id?e.t:e.s)[0]; if (owner) state.expanded.add(owner); }
+    else state.types.add(n.t);
+    state.selected = id; renderChips(); rebuild(true); setTimeout(() => centerOn(id), 350);
+  } else { state.selected = id; if (center) centerOn(id); }
+  renderPanel(); draw();
+}
+
+// ---------- text helpers ----------
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function tipHTML(n){
+  if (n.schema) return `<b>${esc(n.l)}</b>${n.cnt} na ontologia · ${esc(TYPES[n.t].cls)}`;
+  const first = n.d && (n.d['Descrição'] || n.d['Quando usar'] || n.d['Expressão SQL'] || n.d['Nome em inglês'] || n.d['Como as pessoas chamam'] || n.d['Correspondência QUDT']);
+  return `<b>${esc(n.l)}</b><span class="muted">${esc(TYPES[n.t].n)} · ${adj.get(n.id).length} ligações</span>${first ? `<div style="margin-top:4px">${esc(String(first).slice(0,160))}${String(first).length>160?'…':''}</div>`:''}`;
+}
+const swatch = t => `<span class="sw" style="background:${colors[t]}"></span>`;
+function linkBtn(id, warn){ const n = byId.get(id); return `<button class="lk${warn?' warn':''}" data-go="${esc(id)}" title="${esc(TYPES[n.t].n)}">${swatch(n.t)}<span>${esc(n.l)}</span></button>`; }
+
+// ---------- panel ----------
+function renderPanel(){
+  const id = state.selected;
+  if (!id){ panel.innerHTML = introHTML(); bindPanel(); return; }
+  const n = byId.get(id), T = TYPES[n.t];
+  let h = `<div><div class="ptype">${swatch(n.t)}${esc(T.n)}</div><div class="ptitle">${esc(n.l)}</div>${n.schema?'':`<div class="pid">${esc(n.id)}</div>`}</div>`;
+  h += `<div class="sec"><h3>O que é isto na nossa ontologia</h3><p>${esc(T.what)}</p><p class="small muted">Classe: <code>${esc(T.cls)}</code></p></div>`;
+  h += `<div class="sec"><h3>De onde veio</h3><p class="small">${esc(T.from)}</p></div>`;
+  if (n.schema){
+    h += `<div class="sec"><h3>Na ontologia</h3><p>${n.cnt} ${n.cnt===1?'instância':'instâncias'}.</p></div>`;
+    const rels = schemaEdges.filter(e => e.s===id || e.t===id).sort((a,b)=>b.w-a.w);
+    h += `<div class="sec"><h3>Relações</h3><div class="box"><dl>${rels.map(e => { const out = e.s===id; const o = byId.get(out?e.t:e.s); return `<div><dt>${esc(REL[e.kind]?.[out?0:1]||e.kind)}</dt><dd>${linkBtn(o.id)} <span class="muted small">${e.w} ligações</span></dd></div>`; }).join('')}</dl></div></div>`;
+    h += `<button class="btn" data-inst="${n.t}">Ver as instâncias deste tipo</button>`;
+    panel.innerHTML = h; bindPanel(); return;
+  }
+  const d = n.d||{};
+  if (n.fid){ const f = n.fid, tot = f.semantic+f.literal+f.dropped||1;
+    h += `<div class="sec"><h3>Fidelidade da migração deste contrato</h3><div class="fbar" role="img" aria-label="${f.semantic} tipados, ${f.literal} como texto, ${f.dropped} perdidos"><i style="width:${f.semantic/tot*100}%;background:${colors.dataset}"></i><i style="width:${f.literal/tot*100}%;background:${colors.metric}"></i><i style="width:${f.dropped/tot*100}%;background:${colors.warn}"></i></div>
+      <div class="flegend"><span>${f.semantic} tipados</span><span>${f.literal} como texto</span><span>${f.dropped} perdidos</span></div></div>`; }
+  if (n.ag){
+    const conds = ['schema','contracts','onto_sem','onto_full'], models = Object.keys(n.ag);
+    h += `<div class="sec"><h3>Como o agente se saiu nas perguntas que esperam este conjunto</h3><div style="overflow-x:auto"><table><thead><tr><th>Modelo</th>${conds.map(c=>`<th>${COND[c]}</th>`).join('')}</tr></thead><tbody>
+      ${models.map(m => `<tr><td>${m}</td>${conds.map(c => { const v = n.ag[m][c]; return `<td>${v?`${v[0]}/${v[1]}`:'–'}</td>`; }).join('')}</tr>`).join('')}</tbody></table></div><p class="small muted">Acertos sobre perguntas, somando a bateria e o conjunto de 204.</p></div>`;
+  }
+  const keys = Object.keys(d);
+  if (keys.length){
+    h += `<div class="sec"><h3>O que a ontologia sabe</h3><div class="box"><dl>${keys.map(k => { const v = d[k];
+      const val = Array.isArray(v) ? v.map(x=>'• '+x).join('\n') : String(v);
+      const code = /SQL|Expressão|Filtro/.test(k);
+      return `<div><dt>${esc(k)}</dt><dd>${code?`<pre>${esc(val)}</pre>`:esc(val)}</dd></div>`; }).join('')}</dl></div></div>`;
+  }
+  // relations grouped by label
+  const groups = new Map();
+  for (const e of adj.get(id)){
+    const out = e.s===id, o = out?e.t:e.s, lab = REL[e.kind]?.[out?0:1] || e.kind;
+    if (!groups.has(lab)) groups.set(lab, {warn: ['forbidden','notSupports','confused'].includes(e.kind), items:[]});
+    groups.get(lab).items.push({o, w:e.w, kind:e.kind});
+  }
+  if (groups.size){
+    h += `<div class="sec"><h3>Ligações</h3>`;
+    for (const [lab, g] of groups){
+      g.items.sort((a,b)=>(b.w||0)-(a.w||0));
+      const shown = g.items.slice(0,40);
+      h += `<div class="rel"><span class="lab">${esc(lab)} (${g.items.length})</span><div class="links">${shown.map(x => linkBtn(x.o, g.warn) + (x.kind==='confused'?`<span class="small muted">${x.w}×</span>`:'')).join('')}${g.items.length>40?`<span class="small muted">+${g.items.length-40}</span>`:''}</div></div>`;
+    }
+    h += `</div>`;
+  }
+  const hidden = adj.get(id).filter(e => { const o = e.s===id?e.t:e.s; return DETAIL.has(byId.get(o).t) && !view.map.has(o); }).length;
+  if (hidden) h += `<button class="btn" data-expand="${esc(id)}">Mostrar ${hidden} colunas, valores e consultas ligadas a este nó</button>`;
+  else if (state.expanded.has(id)) h += `<button class="btn" data-collapse="${esc(id)}">Esconder colunas, valores e consultas</button>`;
+  h += notesHTML(id);
+  panel.innerHTML = h; bindPanel();
+}
+function introHTML(){
+  const nDs = counts.dataset, tot = G.nodes.length, te = allEdges.length;
+  return `<div><div class="ptype">Como ler</div><div class="ptitle">A ontologia do catálogo de dados abertos do ONS</div></div>
+  <div class="sec"><p>Cada ponto é algo que a ontologia sabe; cada linha é uma relação. Os ${nDs} conjuntos de dados (azul) ficam no centro, ligados ao que medem, à unidade, à família, ao grão espacial e às entidades do setor elétrico.</p></div>
+  <div class="sec"><h3>Experimente</h3><div class="links">
+    ${['ons:Subsistema','unit/mwmed','family/carga','qkind'].map(q => { const n = G.nodes.find(x => x.id===q || x.id.endsWith(q)); return n?linkBtn(n.id):''; }).join('')}
+    ${(() => { const n = G.nodes.find(x => x.t==='dataset' && /balanco_energia_subsistema$/.test(x.id)); return n?linkBtn(n.id):''; })()}
+  </div><p class="small muted">Ligue “Confusões do agente” para ver quais conjuntos o agente troca entre si; a maioria são irmãos da mesma família.</p></div>
+  <div class="sec"><h3>Tamanho</h3><p>${tot.toLocaleString('pt-BR')} nós e ${te.toLocaleString('pt-BR')} ligações. Colunas, apelidos de valores e consultas prontas ficam escondidos: clique num conjunto e peça para mostrá-los, ou ligue o tipo na barra.</p></div>
+  <div class="sec"><h3>Instâncias e esquema</h3><p>“Esquema” resume o grafo por tipo: mostra as classes e quantas ligações existem entre elas.</p></div>
+  ${notesListHTML()}`;
+}
+
+// ---------- notes (db) ----------
+let db = null; const noteIds = new Set();
+function notesHTML(id){
+  if (!db) return '';
+  const mine = state.notes.filter(x => x.node===id);
+  return `<div class="sec"><h3>Sua correção ou orientação</h3>
+    <label class="small muted" for="nt">O que está errado, faltando ou deveria ser diferente aqui? O Claude lê estas notas.</label>
+    <textarea id="nt" placeholder="Ex.: esta métrica não deveria ser somável; falta ligar este conjunto à bacia."></textarea>
+    <div class="row"><button class="btn primary" id="ntSave">Salvar nota</button><span class="small muted" id="ntMsg"></span></div>
+    ${mine.map(x => `<div class="note"><div>${esc(x.text)}</div><div class="meta"><span>${new Date(x.at).toLocaleString('pt-BR')}</span><button data-del="${esc(x._id)}">Apagar</button></div></div>`).join('')}</div>`;
+}
+function notesListHTML(){
+  if (!db) return '';
+  if (!state.notes.length) return `<div class="sec"><h3>Notas para o Claude</h3><p class="small">Nenhuma nota ainda. Clique em qualquer nó e escreva o que corrigir; as notas ficam salvas e o Claude consegue lê-las.</p></div>`;
+  return `<div class="sec"><h3>Notas para o Claude (${state.notes.length})</h3>${state.notes.map(x => `<div class="note"><div>${linkBtn(x.node)}</div><div>${esc(x.text)}</div><div class="meta"><span>${new Date(x.at).toLocaleString('pt-BR')}</span><button data-del="${esc(x._id)}">Apagar</button></div></div>`).join('')}</div>`;
+}
+async function initDb(){
+  try { db = await window.claude?.use?.('db'); } catch { db = null; }
+  if (!db) return;
+  document.getElementById('notesBtn').hidden = false;
+  db.collection('notas').orderBy('at','desc').limit(500).onSnapshot(snap => {
+    state.notes = snap.docs.map(d => Object.assign({_id:d.id}, d.data())).filter(x => byId.has(x.node));
+    noteIds.clear(); for (const x of state.notes) noteIds.add(x.node);
+    document.getElementById('notesN').textContent = state.notes.length;
+    if (!document.activeElement || document.activeElement.id !== 'nt') renderPanel();
+    draw();
+  }, () => {});
+  renderPanel();
+}
+document.getElementById('notesBtn').onclick = () => { state.selected = null; renderPanel(); panel.scrollTop = panel.scrollHeight; };
+
+function bindPanel(){
+  panel.querySelectorAll('[data-go]').forEach(b => b.onclick = () => select(b.dataset.go, true));
+  panel.querySelectorAll('[data-expand]').forEach(b => b.onclick = () => { state.expanded.add(b.dataset.expand); rebuild(true); renderPanel(); });
+  panel.querySelectorAll('[data-collapse]').forEach(b => b.onclick = () => { state.expanded.delete(b.dataset.collapse); rebuild(true); renderPanel(); });
+  panel.querySelectorAll('[data-inst]').forEach(b => b.onclick = () => { state.types.add(b.dataset.inst); setMode('inst'); renderChips(); });
+  panel.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { try { await db.collection('notas').doc(b.dataset.del).delete(); } catch(e){ b.textContent = 'Não foi possível apagar'; } });
+  const save = document.getElementById('ntSave');
+  if (save) save.onclick = async () => {
+    const ta = document.getElementById('nt'), msg = document.getElementById('ntMsg'), text = ta.value.trim();
+    if (!text){ msg.textContent = 'Escreva algo antes de salvar.'; return; }
+    const n = byId.get(state.selected); save.disabled = true; msg.textContent = 'Salvando…';
+    try { await db.collection('notas').add({node:n.id, label:n.l, type:n.t, text, at:new Date().toISOString()}); ta.value=''; msg.textContent = 'Nota salva.'; renderPanel(); }
+    catch(e){ msg.textContent = e && e.code==='quota_exceeded' ? 'Limite de notas atingido: apague algumas antigas.' : 'Não foi possível salvar agora. Tente de novo.'; }
+    finally { save.disabled = false; }
+  };
+}
+
+// ---------- toolbar ----------
+function renderChips(){
+  const c = document.getElementById('chips');
+  c.innerHTML = Object.keys(TYPES).filter(t => counts[t]).map(t => `<button class="chip" data-t="${t}" aria-pressed="${state.types.has(t)}" title="${esc(TYPES[t].what)}">${swatch(t)}${TYPES[t].n} <span class="n">${counts[t].toLocaleString('pt-BR')}</span></button>`).join('');
+  c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const t = b.dataset.t; state.types.has(t) ? state.types.delete(t) : state.types.add(t); renderChips(); if (state.mode==='inst') rebuild(true); });
+  const o = document.getElementById('overlays');
+  o.innerHTML = `<span class="small muted">Ligações extras:</span>` + Object.entries(OVERLAYS).filter(([k]) => k!=='confused' || G.hasAgent).map(([k,v]) => `<button class="chip" data-o="${k}" aria-pressed="${state.overlays.has(k)}" title="${esc(v.tip)}"><span class="sw" style="background:${k==='similar'?colors.accent:colors.warn}"></span>${v.n}</button>`).join('');
+  o.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { const k = b.dataset.o; state.overlays.has(k) ? state.overlays.delete(k) : state.overlays.add(k); renderChips(); if (state.mode==='inst') rebuild(true); });
+}
+function setMode(m){
+  state.mode = m; document.getElementById('m-inst').setAttribute('aria-pressed', m==='inst'); document.getElementById('m-schema').setAttribute('aria-pressed', m==='schema');
+  state.selected = null; view = {nodes:[], links:[], map:new Map()}; rebuild(false); renderPanel();
+}
+document.getElementById('m-inst').onclick = () => setMode('inst');
+document.getElementById('m-schema').onclick = () => setMode('schema');
+
+// search
+const q = document.getElementById('q'), res = document.getElementById('results');
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const index = G.nodes.map(n => ({n, k:norm(n.l+' '+n.id)}));
+let hits = [];
+q.addEventListener('input', () => {
+  const v = norm(q.value.trim()); if (v.length<2){ res.hidden = true; return; }
+  hits = index.filter(x => x.k.includes(v)).sort((a,b) => (DETAIL.has(a.n.t)-DETAIL.has(b.n.t)) || (b.n.deg-a.n.deg)).slice(0,14).map(x=>x.n);
+  res.innerHTML = hits.length ? hits.map(n => `<button data-go="${esc(n.id)}">${swatch(n.t)}<span>${esc(n.l)}</span><span class="small muted" style="margin-left:auto">${esc(TYPES[n.t].n)}</span></button>`).join('') : `<div class="small muted" style="padding:8px 10px">Nada encontrado.</div>`;
+  res.hidden = false;
+  res.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { res.hidden = true; q.value=''; if (state.mode!=='inst') setMode('inst'); select(b.dataset.go, true); });
+});
+q.addEventListener('keydown', ev => { if (ev.key==='Enter' && hits[0]){ res.hidden = true; q.value=''; if (state.mode!=='inst') setMode('inst'); select(hits[0].id, true); } if (ev.key==='Escape'){ res.hidden = true; } });
+document.addEventListener('click', ev => { if (!ev.target.closest('.search')) res.hidden = true; });
+
+// ---------- start ----------
+renderChips();
+new ResizeObserver(size).observe(stage);
+size(); rebuild(false); renderPanel();
+initDb();
+})();
+</script>
