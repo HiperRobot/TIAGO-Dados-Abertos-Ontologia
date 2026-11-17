@@ -128,8 +128,14 @@ question measure the context cost. Sampling parameters cannot be set on this mod
 round is not deterministic. Each condition was run once; two conditions were repeated on the
 battery to measure the variation between runs.
 
-Paired differences use the exact McNemar test with Holm correction, and paired bootstrap
-intervals with 10{,}000 resamples.
+Every question is answered under every condition, so two conditions are compared on the
+same questions. A difference is accepted only when it is larger than chance would produce,
+and the threshold is tightened because several comparisons are made at once. Formally,
+paired differences in accuracy use the exact McNemar test, which looks only at the
+questions on which the two conditions disagree, with the Holm correction for multiple
+comparisons; differences in accuracy and in tokens also get 95\% intervals from 10{,}000
+paired bootstrap resamples, that is, from re-drawing the set of questions at random and
+recomputing the difference each time.
 
 \section{Results}
 
