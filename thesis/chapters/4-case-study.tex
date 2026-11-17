@@ -84,9 +84,12 @@ the ontology is generated from the contracts.}
 
 \section{Data Collection}
 \textbf{Contracts and ontology.} The ontology was built twice. A first, exploratory attempt
-with an AI coding assistant produced a small ontology with hand-curated aliases. It is kept
-as a tagged snapshot and is not used in the results. The second attempt, reported here,
-separates a hand-written schema (T-Box, 168 lines of Turtle) from generated content (A-Box).
+with an AI coding assistant produced a small ontology whose aliases the assistant adjusted
+case by case. It is kept as a tagged snapshot and is not used in the results. The second
+attempt, reported here, separates a hand-written schema (T-Box, 168 lines of Turtle) from
+generated content (A-Box). In this text, \emph{hand-written} means written directly rather
+than produced by a program; in both attempts that writing was done with AI coding assistants
+under the author's direction.
 The schema reuses DCAT and Dublin Core for dataset metadata, RDF Data Cube for measures and
 dimensions, CSVW for columns, SKOS for controlled vocabularies and QUDT for quantity kinds
 and units. A generator reads the 80 contracts and emits 39{,}390 triples; no instance data
@@ -143,7 +146,8 @@ recomputing the difference each time.
 Table~\ref{tab:effort} summarises the two attempts. In the first, the assistant log holds
 19 user prompts, 204 tool calls and 46 minutes of assistant time over four working days,
 with 73 intermediate versions of 26 files. Its outcome covered three contract constructs,
-and the phenomenon aliases were hand-tuned until coverage rose from 22 to 74 of 77 datasets.
+and the assistant adjusted the phenomenon aliases case by case until coverage rose from 22
+to 74 of 77 datasets, with the author approving each step rather than writing the aliases.
 In the second, the mapping is a program: a generator of about 400 lines of Python and 168
 lines of hand-written schema; the whole study code has about 1{,}600 lines.
 The second attempt was also carried out with an AI coding assistant, a different one, in a
