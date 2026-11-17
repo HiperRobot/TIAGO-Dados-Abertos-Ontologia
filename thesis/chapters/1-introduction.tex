@@ -24,8 +24,9 @@ The work extends an existing system rather than building a new one. The demand f
 evolution came from a practical question raised in the project: whether an ontology would
 serve agents better than the contracts already in place. The author is a development intern
 at ONS and a member of the team that builds the server and TIAGO PDA, the open-data portal
-of the operator; to the best of the team's knowledge, the server is the first MCP server of
-the Brazilian power sector.
+of the operator. The server is the official MCP server of ONS, in production since August
+2026; one month later the operator reported about 20 thousand agent connections per month
+and 6 thousand users \cite{baguete2026ons}.
 
 The server is written in Python 3.12 with the FastMCP framework and answers SQL queries
 with DuckDB over Parquet files that ONS publishes on Amazon S3. The study code is also in
