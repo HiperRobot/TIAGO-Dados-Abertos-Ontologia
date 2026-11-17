@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>Grafo da Ontologia ONS</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap">
@@ -60,6 +61,12 @@ canvas.hover{cursor:pointer}
 .tip b{font-family:var(--display);font-size:14px;display:block}
 .hint{position:absolute;left:12px;bottom:12px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;max-width:calc(100% - 24px)}
 .zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:4px}
+.focusbar{position:absolute;left:12px;top:12px;display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;max-width:calc(100% - 24px);box-shadow:0 4px 14px rgba(0,0,0,.12)}
+.focusbar b{font-family:var(--display);font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:3px 9px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.navrow{display:flex;gap:6px;flex-wrap:wrap}
 .zoom .btn{width:34px;height:34px;padding:0;font-size:16px}
 aside.panel{background:var(--surface);border-left:1px solid var(--line);overflow:auto;padding:16px 18px 32px;display:flex;flex-direction:column;gap:16px;min-width:0}
 .ptype{display:inline-flex;gap:6px;align-items:center;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
@@ -108,9 +115,11 @@ textarea{width:100%;min-height:72px;font:inherit;padding:8px;border:1px solid va
   <div class="bar">
     <div class="row">
       <h1>Grafo da ontologia</h1>
-      <div class="mode" role="group" aria-label="Visão">
-        <button id="m-inst" aria-pressed="true">Instâncias</button>
-        <button id="m-schema" aria-pressed="false">Esquema</button>
+      <div class="mode" role="group" aria-label="Visão" id="views">
+        <button data-view="geral" aria-pressed="true" title="Conjuntos de dados, famílias, domínios e entidades do setor">Visão geral</button>
+        <button data-view="medidas" aria-pressed="false" title="Conjuntos, métricas, grandezas, unidades e agregações">Medidas</button>
+        <button data-view="tudo" aria-pressed="false" title="Todos os tipos, menos colunas, apelidos e consultas">Tudo</button>
+        <button data-view="esquema" aria-pressed="false" title="Um ponto por tipo, com o número de ligações entre eles">Esquema</button>
       </div>
       <div class="search">
         <input id="q" type="search" placeholder="Buscar: carga, MWmed, subsistema, EAR…" autocomplete="off" aria-label="Buscar no grafo">
@@ -129,7 +138,8 @@ textarea{width:100%;min-height:72px;font:inherit;padding:8px;border:1px solid va
     <div class="stage" id="stage">
       <canvas id="cv" aria-label="Grafo da ontologia: clique em um nó para ver o que ele significa"></canvas>
       <div class="tip" id="tip" hidden></div>
-      <div class="hint" id="hint">Passe o mouse para ver, clique para abrir, arraste para mover. Roda do mouse aproxima.</div>
+      <div class="hint" id="hint">Passe o mouse para ver, clique para abrir, duplo clique para focar na vizinhança. Esc volta.</div>
+      <div class="focusbar" id="focusbar" hidden></div>
       <div class="zoom"><button class="btn" id="zin" aria-label="Aproximar">+</button><button class="btn" id="zout" aria-label="Afastar">−</button><button class="btn" id="zfit" aria-label="Enquadrar tudo">⤢</button></div>
     </div>
     <aside class="panel" id="panel" aria-live="polite"></aside>
@@ -202,8 +212,23 @@ const schemaEdges = [...agg].map(([k,c]) => { const [a,kind,b] = k.split('|'); r
 for (const n of schemaNodes) byId.set(n.id, n);
 
 // ---------- state ----------
-const state = { mode:'inst', types:new Set(Object.keys(TYPES).filter(t => !DEFAULT_OFF.has(t))), overlays:new Set(Object.keys(OVERLAYS).filter(k=>OVERLAYS[k].on)),
-  expanded:new Set(), selected:null, hover:null, notes:[] };
+const VIEWS = {
+  geral:['dataset','family','domain','entity'],
+  medidas:['dataset','metric','qkind','unit','aggregation'],
+  tudo:Object.keys(TYPES).filter(t => !DEFAULT_OFF.has(t)),
+};
+const state = { mode:'inst', view:'geral', types:new Set(VIEWS.geral), overlays:new Set(Object.keys(OVERLAYS).filter(k=>OVERLAYS[k].on)),
+  expanded:new Set(), selected:null, hover:null, notes:[], focus:null, history:[] };
+
+// domain clusters: every dataset gets the anchor of its domain; metrics, dimensions and families follow their datasets
+const domains = G.nodes.filter(n => n.t==='domain').map(n => n.id);
+const anchorOf = new Map();
+domains.forEach((d,i) => { const a = 2*Math.PI*i/domains.length; anchorOf.set(d, [Math.cos(a)*430, Math.sin(a)*430]); });
+for (const e of allEdges) if (e.kind==='inDomain') anchorOf.set(e.s, anchorOf.get(e.t));
+for (const e of allEdges){
+  if (['hasMetric','hasDimension'].includes(e.kind) && anchorOf.has(e.s)) anchorOf.set(e.t, anchorOf.get(e.s));
+  if (e.kind==='inFamily' && anchorOf.has(e.s) && !anchorOf.has(e.t)) anchorOf.set(e.t, anchorOf.get(e.s));
+}
 let sim, view = {nodes:[], links:[]}, transform = d3.zoomIdentity;
 const cv = document.getElementById('cv'), ctx = cv.getContext('2d'), stage = document.getElementById('stage');
 const tip = document.getElementById('tip'), panel = document.getElementById('panel');
@@ -221,7 +246,20 @@ new MutationObserver(() => { readColors(); draw(); }).observe(document.documentE
 function visibleSet(){
   if (state.mode==='schema') return {nodes:schemaNodes, links:schemaEdges};
   const vis = new Set();
-  for (const n of G.nodes) if (state.types.has(n.t)) vis.add(n.id);
+  if (state.focus){
+    // local graph: everything within N steps of the focused node (columns, aliases and queries only when expanded)
+    let frontier = [state.focus.id]; vis.add(state.focus.id);
+    for (let d=0; d<state.focus.depth; d++){
+      const next = [];
+      for (const id of frontier) for (const e of adj.get(id)){
+        if ((e.kind==='similar'||e.kind==='confused'||e.kind==='notSupports') && !state.overlays.has(e.kind)) continue;
+        const o = e.s===id?e.t:e.s; if (vis.has(o) || DETAIL.has(byId.get(o).t)) continue;
+        if (d>0 && ['aggregation','status','usecase','perspective','domain'].includes(byId.get(o).t)) continue; // hubs only at the first step
+        vis.add(o); next.push(o);
+      }
+      frontier = next;
+    }
+  } else for (const n of G.nodes) if (state.types.has(n.t)) vis.add(n.id);
   for (const id of state.expanded){ vis.add(id); for (const e of adj.get(id)){ const o = e.s===id?e.t:e.s; if (DETAIL.has(byId.get(o).t)) { vis.add(o); for (const e2 of adj.get(o)){ const o2 = e2.s===o?e2.t:e2.s; if (byId.get(o2).t==='alias') vis.add(o2);} } } }
   if (state.selected && byId.has(state.selected) && !state.selected.startsWith('T:')) vis.add(state.selected);
   const links = allEdges.filter(e => vis.has(e.s) && vis.has(e.t) &&
@@ -250,7 +288,8 @@ function rebuild(keepAlpha){
         .strength(l => schema ? .5 : l.kind==='similar'? .08*(l.w||.2)*4 : l.kind==='confused'? .05 : (['qkind','unit','aggregation','supports','status','perspective','forbidden','inDomain'].includes(l.kind) ? .03 : .5)))
     .force('charge', d3.forceManyBody().strength(n => schema ? -900 : -18 - n.r*4).distanceMax(schema?900:380))
     .force('collide', d3.forceCollide(n => n.r + 1.5))
-    .force('x', d3.forceX(0).strength(schema?.02:.035)).force('y', d3.forceY(0).strength(schema?.02:.035))
+    .force('x', d3.forceX(n => (!schema && !state.focus && anchorOf.get(n.id)) ? anchorOf.get(n.id)[0] : 0).strength(n => schema?.02 : (!state.focus && anchorOf.has(n.id)) ? .07 : .035))
+    .force('y', d3.forceY(n => (!schema && !state.focus && anchorOf.get(n.id)) ? anchorOf.get(n.id)[1] : 0).strength(n => schema?.02 : (!state.focus && anchorOf.has(n.id)) ? .07 : .035))
     .alphaDecay(.03).on('tick', draw);
   if (!keepAlpha){ sim.stop(); for (let i=0;i<220;i++) sim.tick(); fit(false); sim.alpha(.08).restart(); }
   else sim.alpha(.5).restart();
@@ -295,7 +334,7 @@ function draw(){
   ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   for (const n of view.nodes){
     const isFocus = nb && nb.has(n.id);
-    const show = state.mode==='schema' || isFocus || (!nb && (n.r*k > 9 || (k>2.2 && !DETAIL.has(n.t)) || k>4));
+    const show = state.mode==='schema' || isFocus || (!nb && (state.focus || n.r*k > 9 || (state.view==='geral' && n.t!=='dataset' && k>.5) || (k>1.6 && !DETAIL.has(n.t)) || k>4));
     if (!show) continue;
     ctx.globalAlpha = nb && !isFocus ? .1 : 1;
     const fs = (state.mode==='schema'?13:Math.max(10, Math.min(13, 8+n.r*.5)))/k;
@@ -338,6 +377,25 @@ cv.addEventListener('mousemove', ev => {
 });
 cv.addEventListener('mouseleave', () => { state.hover = null; tip.hidden = true; draw(); });
 cv.addEventListener('click', ev => { const n = pick(ev); if (n) select(n.id); else if (state.selected){ state.selected = null; renderPanel(); draw(); } });
+cv.addEventListener('dblclick', ev => { const n = pick(ev); if (n && !n.schema) focusOn(n.id, state.focus?.depth || 1); });
+document.addEventListener('keydown', ev => {
+  if (ev.key!=='Escape' || ev.target.closest('input,textarea')) return;
+  if (state.focus) exitFocus(); else if (state.selected){ state.selected = null; renderPanel(); draw(); }
+});
+function focusOn(id, depth){
+  state.focus = {id, depth}; state.selected = id; view = {nodes:[], links:[], map:new Map()};
+  rebuild(false); renderFocusBar(); renderPanel();
+}
+function exitFocus(){ const id = state.focus?.id; state.focus = null; view = {nodes:[], links:[], map:new Map()}; rebuild(false); renderFocusBar(); if (id) { state.selected = id; setTimeout(() => centerOn(id), 50); } renderPanel(); }
+function renderFocusBar(){
+  const fb = document.getElementById('focusbar');
+  if (!state.focus){ fb.hidden = true; return; }
+  const n = byId.get(state.focus.id);
+  fb.hidden = false;
+  fb.innerHTML = `<span class="small muted">Foco em</span> <b>${esc(n.l)}</b> <span class="seg" role="group" aria-label="Distância">${[1,2,3].map(d => `<button data-d="${d}" aria-pressed="${state.focus.depth===d}">${d} ${d===1?'passo':'passos'}</button>`).join('')}</span> <button class="btn" id="fbExit">Ver o grafo inteiro</button>`;
+  fb.querySelectorAll('[data-d]').forEach(b => b.onclick = () => focusOn(state.focus.id, +b.dataset.d));
+  document.getElementById('fbExit').onclick = exitFocus;
+}
 document.getElementById('zin').onclick = () => sel.transition().duration(250).call(zoom.scaleBy, 1.5);
 document.getElementById('zout').onclick = () => sel.transition().duration(250).call(zoom.scaleBy, 1/1.5);
 document.getElementById('zfit').onclick = () => fit(true);
@@ -353,8 +411,10 @@ function centerOn(id){
   const k = Math.max(transform.k, 1.4);
   sel.transition().duration(450).call(zoom.transform, d3.zoomIdentity.translate(-k*n.x, -k*n.y).scale(k));
 }
-function select(id, center){
+function select(id, center, fromBack){
   const n = byId.get(id); if (!n) return;
+  if (!fromBack && state.selected && state.selected!==id){ state.history.push(state.selected); if (state.history.length>50) state.history.shift(); }
+  if (state.focus && !view.map.has(id) && !n.schema){ focusOn(id, state.focus.depth); return; }
   if (state.mode==='inst' && !n.schema && !view.map.has(id)){
     if (DETAIL.has(n.t)){ const owner = adj.get(id).map(e => e.s===id?e.t:e.s).find(o => !DETAIL.has(byId.get(o).t)) || adj.get(id).map(e => e.s===id?e.t:e.s)[0]; if (owner) state.expanded.add(owner); }
     else state.types.add(n.t);
@@ -378,7 +438,15 @@ function renderPanel(){
   const id = state.selected;
   if (!id){ panel.innerHTML = introHTML(); bindPanel(); return; }
   const n = byId.get(id), T = TYPES[n.t];
-  let h = `<div><div class="ptype">${swatch(n.t)}${esc(T.n)}</div><div class="ptitle">${esc(n.l)}</div>${n.schema?'':`<div class="pid">${esc(n.id)}</div>`}</div>`;
+  let h = '';
+  const nav = [];
+  if (state.history.length) nav.push(`<button class="btn" id="pBack">← Voltar para ${esc(byId.get(state.history[state.history.length-1])?.l||'')}</button>`);
+  if (!n.schema){
+    if (!state.focus || state.focus.id!==id) nav.push(`<button class="btn primary" data-focus="${esc(id)}">Focar na vizinhança</button>`);
+    else nav.push(`<button class="btn" id="pExit">Ver o grafo inteiro</button>`);
+  }
+  if (nav.length) h += `<div class="navrow">${nav.join('')}</div>`;
+  h += `<div><div class="ptype">${swatch(n.t)}${esc(T.n)}</div><div class="ptitle">${esc(n.l)}</div>${n.schema?'':`<div class="pid">${esc(n.id)}</div>`}</div>`;
   h += `<div class="sec"><h3>O que é isto na nossa ontologia</h3><p>${esc(T.what)}</p><p class="small muted">Classe: <code>${esc(T.cls)}</code></p></div>`;
   h += `<div class="sec"><h3>De onde veio</h3><p class="small">${esc(T.from)}</p></div>`;
   if (n.schema){
@@ -429,7 +497,8 @@ function renderPanel(){
 function introHTML(){
   const nDs = counts.dataset, tot = G.nodes.length, te = allEdges.length;
   return `<div><div class="ptype">Como ler</div><div class="ptitle">A ontologia do catálogo de dados abertos do ONS</div></div>
-  <div class="sec"><p>Cada ponto é algo que a ontologia sabe; cada linha é uma relação. Os ${nDs} conjuntos de dados (azul) ficam no centro, ligados ao que medem, à unidade, à família, ao grão espacial e às entidades do setor elétrico.</p></div>
+  <div class="sec"><p>Cada ponto é algo que a ontologia sabe; cada linha é uma relação. Os ${nDs} conjuntos de dados (azul) ficam agrupados pelo domínio (carga, geração, hidrologia…), ligados à família, ao grão espacial e às entidades do setor elétrico.</p></div>
+  <div class="sec"><h3>Como navegar</h3><p class="small">Comece pela <b>Visão geral</b>. Clique num conjunto para ler o que a ontologia sabe dele. <b>Duplo clique</b> ou “Focar na vizinhança” mostra só o que está ligado a ele, como o grafo local do Obsidian; aumente para 2 ou 3 passos. <b>Medidas</b> mostra métricas, grandezas e unidades. <b>Esc</b> volta.</p></div>
   <div class="sec"><h3>Experimente</h3><div class="links">
     ${['ons:Subsistema','unit/mwmed','family/carga','qkind'].map(q => { const n = G.nodes.find(x => x.id===q || x.id.endsWith(q)); return n?linkBtn(n.id):''; }).join('')}
     ${(() => { const n = G.nodes.find(x => x.t==='dataset' && /balanco_energia_subsistema$/.test(x.id)); return n?linkBtn(n.id):''; })()}
@@ -472,9 +541,12 @@ document.getElementById('notesBtn').onclick = () => { state.selected = null; ren
 
 function bindPanel(){
   panel.querySelectorAll('[data-go]').forEach(b => b.onclick = () => select(b.dataset.go, true));
+  panel.querySelectorAll('[data-focus]').forEach(b => b.onclick = () => focusOn(b.dataset.focus, 1));
+  const back = document.getElementById('pBack'); if (back) back.onclick = () => { const id = state.history.pop(); if (id) select(id, true, true); };
+  const ex = document.getElementById('pExit'); if (ex) ex.onclick = exitFocus;
   panel.querySelectorAll('[data-expand]').forEach(b => b.onclick = () => { state.expanded.add(b.dataset.expand); rebuild(true); renderPanel(); });
   panel.querySelectorAll('[data-collapse]').forEach(b => b.onclick = () => { state.expanded.delete(b.dataset.collapse); rebuild(true); renderPanel(); });
-  panel.querySelectorAll('[data-inst]').forEach(b => b.onclick = () => { state.types.add(b.dataset.inst); setMode('inst'); renderChips(); });
+  panel.querySelectorAll('[data-inst]').forEach(b => b.onclick = () => { state.view = 'custom'; state.types.add(b.dataset.inst); renderChips(); setMode('inst'); });
   panel.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => { try { await db.collection('notas').doc(b.dataset.del).delete(); } catch(e){ b.textContent = 'Não foi possível apagar'; } });
   const save = document.getElementById('ntSave');
   if (save) save.onclick = async () => {
@@ -491,17 +563,21 @@ function bindPanel(){
 function renderChips(){
   const c = document.getElementById('chips');
   c.innerHTML = Object.keys(TYPES).filter(t => counts[t]).map(t => `<button class="chip" data-t="${t}" aria-pressed="${state.types.has(t)}" title="${esc(TYPES[t].what)}">${swatch(t)}${TYPES[t].n} <span class="n">${counts[t].toLocaleString('pt-BR')}</span></button>`).join('');
-  c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const t = b.dataset.t; state.types.has(t) ? state.types.delete(t) : state.types.add(t); renderChips(); if (state.mode==='inst') rebuild(true); });
+  c.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const t = b.dataset.t; state.types.has(t) ? state.types.delete(t) : state.types.add(t); state.view = 'custom'; markViews(); renderChips(); if (state.mode==='inst' && !state.focus) rebuild(true); });
   const o = document.getElementById('overlays');
   o.innerHTML = `<span class="small muted">Ligações extras:</span>` + Object.entries(OVERLAYS).filter(([k]) => k!=='confused' || G.hasAgent).map(([k,v]) => `<button class="chip" data-o="${k}" aria-pressed="${state.overlays.has(k)}" title="${esc(v.tip)}"><span class="sw" style="background:${k==='similar'?colors.accent:colors.warn}"></span>${v.n}</button>`).join('');
   o.querySelectorAll('[data-o]').forEach(b => b.onclick = () => { const k = b.dataset.o; state.overlays.has(k) ? state.overlays.delete(k) : state.overlays.add(k); renderChips(); if (state.mode==='inst') rebuild(true); });
 }
+function markViews(){ document.querySelectorAll('#views [data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view===(state.mode==='schema'?'esquema':state.view))); }
 function setMode(m){
-  state.mode = m; document.getElementById('m-inst').setAttribute('aria-pressed', m==='inst'); document.getElementById('m-schema').setAttribute('aria-pressed', m==='schema');
+  state.mode = m; state.focus = null; if (m==='inst' && state.view==='esquema') state.view = 'custom'; renderFocusBar(); markViews();
   state.selected = null; view = {nodes:[], links:[], map:new Map()}; rebuild(false); renderPanel();
 }
-document.getElementById('m-inst').onclick = () => setMode('inst');
-document.getElementById('m-schema').onclick = () => setMode('schema');
+function setView(v){
+  if (v==='esquema'){ state.view = 'esquema'; setMode('schema'); return; }
+  state.view = v; state.types = new Set(VIEWS[v]); renderChips(); setMode('inst');
+}
+document.querySelectorAll('#views [data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
 
 // search
 const q = document.getElementById('q'), res = document.getElementById('results');

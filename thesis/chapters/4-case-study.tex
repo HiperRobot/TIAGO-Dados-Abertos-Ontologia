@@ -97,8 +97,13 @@ with its level of representation.
 system were used: a curated test battery with 133 questions, of which 106 are usable for
 routing (27 follow-up questions that depend on a previous turn and rows with no expected
 dataset were excluded), and a selector benchmark with 204 questions that have exactly one
-correct dataset. Neither set repeats a question indexed by the server. \todo{Record the
-authorisation from ONS and the provenance of the 204 set.}
+correct dataset. Neither set repeats a question indexed by the server. The battery was
+curated by a member of the quality team in June 2026 to cover 77 datasets with a mix of
+difficulty, subsystems, sources and writing styles; the selector benchmark was assembled by
+another member of the development team in the same month to measure dataset selection. The
+two sets are not independent: 65 of the 204 questions share at least 60\% of their words
+with a battery question, 24 of them all of their words, and in 4 of these 65 pairs the two
+sets expect different datasets. \todo{Record the authorisation from ONS.}
 
 \textbf{Process records.} For the first attempt, the conversation log of the assistant and
 the file snapshots it kept; for the second, the version history of the study repository.
@@ -350,7 +355,11 @@ were written for another system and their expected datasets reflect that system'
 
 \textbf{Internal validity.} The ontology content comes from the same contracts it is
 compared with, which bounds what it can add. The agent runs on a non-deterministic model; the
-repeat of two conditions changed the outcome of three to four questions out of 106. The question sets had already been used to evaluate the first attempt when the second
+repeat of two conditions changed the outcome of three to four questions out of 106. The two
+question sets overlap; on the 139 questions of the larger set that do not resemble any
+battery question, the contracts and the semantic-only ontology reach the same accuracy under
+all three models (0.856, 0.899 and 0.878 for Haiku, Sonnet and Opus), so the overlap does
+not drive the main result. The question sets had already been used to evaluate the first attempt when the second
 ontology was designed: the generator has no parameter fitted to them, but the design was
 not blind to those results.
 
