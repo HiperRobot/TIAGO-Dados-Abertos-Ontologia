@@ -9,9 +9,11 @@ right table and whether it treats a value correctly.
 Two families of description are in use. \emph{Data contracts} describe one dataset at a
 time: its schema, its quality guarantees and, in richer variants, its semantics.
 \emph{Ontologies} describe a domain: its concepts, the relations between them and the
-vocabulary that names them, with datasets attached to that shared model. Contracts are easy
-to write and to keep next to the data. Ontologies promise knowledge that crosses datasets
-and that can be aligned with standards. \todo{Support both sentences with references.}
+vocabulary that names them, with datasets attached to that shared model. Contracts are
+plain YAML documents that follow an open standard and are kept next to the data
+\cite{odcs2026}. Ontologies are explicit specifications of a shared conceptualisation
+\cite{gruber1993translation,studer1998knowledge}; they promise knowledge that crosses
+datasets and can reuse standard vocabularies such as those of the W3C \cite{dcat3,skos2009}.
 
 This work studies what happens when a system built on data contracts is migrated to an
 ontology. The system is TIAGO Dados Abertos, an open-source server that exposes the open
@@ -31,8 +33,8 @@ and 6 thousand users \cite{baguete2026ons}.
 The server is written in Python 3.12 with the FastMCP framework and answers SQL queries
 with DuckDB over Parquet files that ONS publishes on Amazon S3. The study code is also in
 Python, the ontology is written in RDF (Turtle), and the agent experiments run on Amazon
-Bedrock. \todo{Manual, item 1: one sentence on how the work applies what was learned in
-the course (name the disciplines).}
+Bedrock. \todo{Manual, item 1: name the PUC-Rio courses whose content the work applies
+(for example databases, software engineering, artificial intelligence, statistics).}
 
 \section{Goal and Research Questions}
 The goal of this work, stated with the GQM template \cite{basili1988tame}, is to

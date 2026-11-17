@@ -6,43 +6,85 @@ tools. The model receives a task, a description of the tools it may call and the
 previous calls, and decides the next step. Everything the agent knows about an external
 system reaches it as text in this loop: the descriptions of the tools and what the tools
 return. The amount of that text is the context the agent consumes, and it is billed and
-limited. \todo{Add one or two references on tool-using agents.}
+limited. ReAct showed that interleaving reasoning steps with actions on external tools
+improves question answering and decision making \cite{yao2022react}, and Toolformer showed
+that a model can learn by itself when and how to call tools such as a search engine or a
+calculator \cite{schick2023toolformer}.
 
 \section{Model Context Protocol}
 The Model Context Protocol (MCP) is an open standard for connecting AI applications to
 external systems \cite{mcp2026intro}. A server can expose three kinds of primitives: tools,
 which are executable functions the application can invoke; resources, which are data sources
 that provide context; and prompts, which are reusable templates. The server studied here
-exposes its catalogue through four tools and one resource. \todo{Add who introduced the
-protocol and when, from a primary source.}
+exposes its catalogue through four tools and one resource. The protocol was created at
+Anthropic and released as open source in November 2024 \cite{anthropic2024mcp}.
 
 \section{Data Contracts}
 A data contract is a document, kept with the data, that states what a dataset contains and
 what its consumers may rely on. The Open Data Contract Standard (ODCS) defines the keys and
 values of a contract written in YAML \cite{odcs2026}. Its sections cover fundamentals,
 schema, data quality, service-level agreements, infrastructure and servers, team and roles,
-and custom properties, among others. \todo{State the version used by the server (the
-contracts declare apiVersion v3.1.0) and the maintainer of the standard, from a primary
-source.}
+and custom properties, among others. The standard is maintained by Bitol, a project of the
+Linux Foundation AI \& Data \cite{bitol2026}. The contracts of the case declare version
+3.1.0, released in December 2025; version 3.2.0 followed in September 2026
+\cite{odcsreleases2026}.
 
 The contracts of the case use the custom properties to carry what the standard does not
 define: tags and retrieval context for agents, example questions, and a \texttt{semantics}
 block with the row grain, the dimension columns, the metrics with their quantity kind, unit
-and aggregation rules, and the aliases of coded values. Figure \todo{n} shows an excerpt.
+and aggregation rules, and the aliases of coded values. Figure~\ref{fig:contract} shows an
+excerpt.
+
+\begin{figure}[ht]
+\centering
+\begin{minipage}{0.88\textwidth}
+\footnotesize
+\begin{verbatim}
+- property: semantics
+  value:
+    family: carga
+    temporal_perspective: verificado
+    row_grain:
+      temporal: 1 dia
+      entity: subsistema
+      one_row_per: [din_instante, id_subsistema]
+    metrics:
+    - id: cargaenergiamwmed
+      label: Carga Verificada
+      expression: TRY_CAST(val_cargaenergiamwmed AS DOUBLE)
+      quantity_kind: average_power
+      unit_native: MWmed
+      interval_hours: 24.0
+      aggregation_modes:
+        total_energy:
+          sql: SUM((...) * 24.0) / 1000
+          unit: GWh
+      aliases: [carga, demanda, consumo energia, ...]
+    query_routing:
+      supports_time_series: true
+      supports_ranking: false
+\end{verbatim}
+\end{minipage}
+\caption{Excerpt of the \texttt{semantics} block of the contract of the daily load dataset
+(\texttt{carga-energia}), abridged.}
+\label{fig:contract}
+\end{figure}
 
 \section{Ontologies}
 An ontology is an explicit specification of the concepts of a domain and of the relations
-between them. \todo{Reference.} In the RDF family of languages, the schema-level statements
+between them \cite{gruber1993translation,studer1998knowledge}. In the RDF family of languages, the schema-level statements
 (classes and properties) are called the T-Box and the statements about individuals the
 A-Box. This work reuses five vocabularies. DCAT is an RDF vocabulary designed to facilitate
 interoperability between data catalogues published on the Web, and is a W3C Recommendation
 since August 2024 in its third version \cite{dcat3}. The RDF Data Cube vocabulary, a W3C
 Recommendation of January 2014, describes multi-dimensional statistical data with measures
-and dimensions \cite{datacube}. SKOS provides labels and concept schemes, and CSVW describes
-tabular columns. \todo{References for SKOS and CSVW.} QUDT provides semantic specifications
+and dimensions \cite{datacube}. SKOS provides labels and concept schemes \cite{skos2009}, and
+the CSVW metadata vocabulary describes tabular data and its columns \cite{csvw2015}. QUDT provides semantic specifications
 for units of measure, quantity kinds, dimensions and data types \cite{qudt}.
 
 For power systems, the Common Information Model (CIM) of the IEC defines classes such as
-substation, generating unit, hydro power plant and reservoir. \todo{Reference to IEC 61970.}
+substation, generating unit, hydro power plant and reservoir \cite{iec61970301}. The
+alignments of this work were checked against version 17 of the model, the one described by
+that edition of the standard.
 The ontology of this work aligns its spatial entities to CIM classes with loose matches and
 keeps the concepts specific to the Brazilian system in its own namespace.
