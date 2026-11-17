@@ -1,0 +1,80 @@
+\chapter{Introduction}
+
+\section{Context and Motivation}
+Agents based on large language models increasingly answer questions by querying data through
+tools. What such an agent knows about a dataset is whatever the tool tells it: names, types,
+descriptions, units, rules. This layer of description decides whether the agent picks the
+right table and whether it treats a value correctly.
+
+Two families of description are in use. \emph{Data contracts} describe one dataset at a
+time: its schema, its quality guarantees and, in richer variants, its semantics.
+\emph{Ontologies} describe a domain: its concepts, the relations between them and the
+vocabulary that names them, with datasets attached to that shared model. Contracts are
+plain YAML documents that follow an open standard and are kept next to the data
+\cite{odcs2026}. Ontologies are explicit specifications of a shared conceptualisation
+\cite{gruber1993translation,studer1998knowledge}; they promise knowledge that crosses
+datasets and can reuse standard vocabularies such as those of the W3C \cite{dcat3,skos2009}.
+
+This work studies what happens when a system built on data contracts is migrated to an
+ontology. The system is TIAGO Dados Abertos, an open-source server that exposes the open
+data of the Brazilian power system operator (ONS) through the Model Context Protocol (MCP).
+Its 80 datasets cover load, generation, reservoirs, prices and reliability indicators. The
+domain is unforgiving: average power is published in MWmed and stored energy in MWmes, and
+summing either along time produces a number that looks plausible and is wrong.
+
+The work extends an existing system rather than building a new one. The demand for
+evolution came from a practical question raised in the project: whether an ontology would
+serve agents better than the contracts already in place. The author is a development intern
+at ONS and a member of the team that builds the server and TIAGO PDA, the open-data portal
+of the operator. The server is the official MCP server of ONS, in production since August
+2026; one month later the operator reported about 20 thousand agent connections per month
+and 6 thousand users \cite{baguete2026ons}.
+
+The server is written in Python 3.12 with the FastMCP framework and answers SQL queries
+with DuckDB over Parquet files that ONS publishes on Amazon S3. The study code is also in
+Python, the ontology is written in RDF (Turtle), and the agent experiments run on Amazon
+Bedrock.
+
+The work applies the content of several courses of the program. From Software Engineering
+come the case-study method, the GQM goal and the discipline of version control and review.
+From Databases come the SQL, the relational schemas and the analytical engine the server
+uses. From Software Testing and Measurement come the reference question sets, the metrics
+and the statistical comparison of conditions. From Data Science come the data contracts,
+the ontology and the metadata standards that describe the datasets. And from
+Human-Computer Interaction comes the attention to the people and agents who query the
+server every day, whose way of asking questions is what the evaluation tries to reproduce.
+
+\section{Goal and Research Questions}
+The goal of this work, stated with the GQM template \cite{basili1988tame}, is to
+\textbf{analyze} the migration of ODCS data contracts to a domain ontology in an MCP server
+\textbf{for the purpose of} characterization \textbf{with respect to} migration effort,
+mapping fidelity, routing effectiveness, agent effectiveness and context cost
+\textbf{from the point of view of} the researcher \textbf{in the context of} the
+open-source MCP server TIAGO Dados Abertos, which exposes the open datasets of the
+Brazilian power system operator to LLM-based agents. Each aspect gives one research
+question, detailed in Section~\ref{sec:goal-rqs}.
+
+\section{Research Method}
+The work is a case study following \citeonline{runeson2012case}. The case is the migration
+itself, observed in the real server with its real contracts. Evidence comes from four
+sources: the contracts and the ontology derived from them, a ledger that records how each
+contract construct was represented, two sets of questions written by ONS staff, and the
+process records of the migration. Two experiments are embedded in the case: one with the
+server's deterministic router and one with an LLM-based agent on Amazon Bedrock.
+
+\section{Contributions}
+\begin{itemize}[leftmargin=1.5cm]
+\item An ontology for the ONS open-data catalogue whose content is generated from the data
+contracts, together with the generator.
+\item A construct-level account of the migration: what becomes typed knowledge, what
+survives only as text, and what is left behind.
+\item An evaluation, on questions written by people, of a router and of an LLM-based agent
+fed by contracts, by the ontology, or by both, including context cost.
+\item A prototype MCP server that answers from the ontology.
+\item Lessons learned from two attempts at the migration.
+\end{itemize}
+
+\section{Outline}
+Chapter 2 presents the background on LLM-based agents, the Model Context Protocol, data
+contracts and ontologies. Chapter 3 discusses related work. Chapter 4 reports the case
+study. Chapter 5 concludes with contributions, limitations and future work.

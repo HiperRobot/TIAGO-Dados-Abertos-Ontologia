@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+.venv/
+viz/ontology_graph.html

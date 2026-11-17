@@ -1,0 +1,226 @@
+{
+ "gold": "battery_v2.jsonl",
+ "n": 106,
+ "corpus_commit": "94af8d4",
+ "datasets": {
+  "schema": 80,
+  "contracts": 80,
+  "onto_sem": 80,
+  "onto_full": 80
+ },
+ "conditions": {
+  "schema": {
+   "n": 106,
+   "top1": 0.330188679245283,
+   "top1_ci95": [
+    0.2479785534130129,
+    0.42427676697561933
+   ],
+   "top3": 0.5660377358490566,
+   "top5": 0.660377358490566,
+   "mrr": 0.45125786163522014
+  },
+  "contracts": {
+   "n": 106,
+   "top1": 0.6792452830188679,
+   "top1_ci95": [
+    0.5854599372180149,
+    0.7604927801495398
+   ],
+   "top3": 0.9339622641509434,
+   "top5": 0.9433962264150944,
+   "mrr": 0.7953728661275831
+  },
+  "contracts+onto": {
+   "n": 106,
+   "top1": 0.6886792452830188,
+   "top1_ci95": [
+    0.595235830212175,
+    0.7689249249115668
+   ],
+   "top3": 0.9339622641509434,
+   "top5": 0.9433962264150944,
+   "mrr": 0.8016621743036838
+  },
+  "onto_sem": {
+   "n": 106,
+   "top1": 0.6320754716981132,
+   "top1_ci95": [
+    0.5371525943196658,
+    0.7177599342669534
+   ],
+   "top3": 0.9245283018867925,
+   "top5": 0.9528301886792453,
+   "mrr": 0.7708445642407907
+  },
+  "onto_full": {
+   "n": 106,
+   "top1": 0.6792452830188679,
+   "top1_ci95": [
+    0.5854599372180149,
+    0.7604927801495398
+   ],
+   "top3": 0.9339622641509434,
+   "top5": 0.9433962264150944,
+   "mrr": 0.7953728661275831
+  }
+ },
+ "paired": {
+  "schema vs contracts": {
+   "only_a": 4,
+   "only_b": 41,
+   "p": 9.334883088740753e-09,
+   "p_holm": 4.6674415443703765e-08,
+   "top1_diff": [
+    0.3490566037735849,
+    0.24528301886792453,
+    0.4528301886792453
+   ],
+   "mrr_diff": [
+    0.344115004492363,
+    0.2624438454627134,
+    0.4244496855345912
+   ]
+  },
+  "contracts vs contracts+onto": {
+   "only_a": 0,
+   "only_b": 1,
+   "p": 1.0,
+   "p_holm": 1.0,
+   "top1_diff": [
+    0.009433962264150943,
+    0.0,
+    0.02830188679245283
+   ],
+   "mrr_diff": [
+    0.006289308176100629,
+    0.0,
+    0.018867924528301886
+   ]
+  },
+  "contracts vs onto_full": {
+   "only_a": 0,
+   "only_b": 0,
+   "p": 1.0,
+   "p_holm": 1.0,
+   "top1_diff": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "mrr_diff": [
+    0.0,
+    0.0,
+    0.0
+   ]
+  },
+  "contracts vs onto_sem": {
+   "only_a": 16,
+   "only_b": 11,
+   "p": 0.44206833839416504,
+   "p_holm": 1.0,
+   "top1_diff": [
+    -0.04716981132075472,
+    -0.14150943396226415,
+    0.04716981132075472
+   ],
+   "mrr_diff": [
+    -0.024528301886792454,
+    -0.08050314465408805,
+    0.030211141060197667
+   ]
+  },
+  "schema vs onto_sem": {
+   "only_a": 6,
+   "only_b": 38,
+   "p": 9.430375484953402e-07,
+   "p_holm": 3.7721501939813606e-06,
+   "top1_diff": [
+    0.3018867924528302,
+    0.18867924528301888,
+    0.4056603773584906
+   ],
+   "mrr_diff": [
+    0.3195867026055706,
+    0.23766846361185984,
+    0.4003930817610063
+   ]
+  }
+ },
+ "by_stratum": {
+  "dificil": {
+   "n": 15,
+   "schema": 0.06666666666666667,
+   "contracts": 0.4,
+   "contracts+onto": 0.4,
+   "onto_sem": 0.3333333333333333,
+   "onto_full": 0.4
+  },
+  "facil": {
+   "n": 50,
+   "schema": 0.42,
+   "contracts": 0.84,
+   "contracts+onto": 0.84,
+   "onto_sem": 0.78,
+   "onto_full": 0.84
+  },
+  "media": {
+   "n": 41,
+   "schema": 0.3170731707317073,
+   "contracts": 0.5853658536585366,
+   "contracts+onto": 0.6097560975609756,
+   "onto_sem": 0.5609756097560976,
+   "onto_full": 0.5853658536585366
+  }
+ },
+ "changed_by_ontology": [
+  {
+   "id": "DS-031",
+   "valid": [
+    "ear-diario-por-ree-reservatorio-equivalente-de-energia"
+   ],
+   "contracts": [
+    "ear-diario-por-ree-reservatorio-equivalente-de-energia",
+    "ear-diario-por-reservatorio",
+    "ear-diario-por-subsistema"
+   ],
+   "contracts+onto": [
+    "ear-diario-por-ree-reservatorio-equivalente-de-energia",
+    "ear-diario-por-subsistema",
+    "ear-diario-por-reservatorio"
+   ]
+  },
+  {
+   "id": "DS-033",
+   "valid": [
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia"
+   ],
+   "contracts": [
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia",
+    "ena-diario-por-reservatorio",
+    "ena-diario-por-subsistema"
+   ],
+   "contracts+onto": [
+    "ena-diario-por-ree-reservatorio-equivalente-de-energia",
+    "ena-diario-por-subsistema",
+    "ena-diario-por-reservatorio"
+   ]
+  },
+  {
+   "id": "PL-080",
+   "valid": [
+    "intercambio-internacional"
+   ],
+   "contracts": [
+    "intercambio-nacional",
+    "carga-energia",
+    "intercambio-internacional"
+   ],
+   "contracts+onto": [
+    "intercambio-internacional",
+    "carga-energia",
+    "intercambio-nacional"
+   ]
+  }
+ ]
+}

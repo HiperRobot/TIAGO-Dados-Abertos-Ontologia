@@ -1,0 +1,393 @@
+\chapter{Case Study on Migrating Data Contracts to Ontologies}
+\label{ch:case}
+
+\section{Introduction}
+This chapter reports a case study conducted according to the guidelines of
+\citeonline{runeson2012case}. A case study fits the problem because the migration is a
+contemporary phenomenon that can only be observed inside a real system: the contracts, the
+server that consumes them and the questions asked by its users are not under the control of
+the researcher. The study is a single-case, descriptive and exploratory study. Its purpose
+is to characterise the migration, not to test a causal hypothesis; the experiments reported
+below are sources of evidence inside the case.
+
+\section{Goal and Research Questions}
+\label{sec:goal-rqs}
+The goal stated in Chapter 1 is refined into five research questions, one per metric group.
+\begin{description}[leftmargin=1cm]
+\item[RQ1 (Effort)] What steps, decisions and effort were required to derive the ontology from the data contracts?
+\item[RQ2 (Fidelity)] To what extent are the constructs of the data contracts represented in the ontology as typed knowledge, as opaque literals, or not at all?
+\item[RQ3 (Routing effectiveness)] How does the accuracy of the server's dataset router change when it is fed by the contracts, by the ontology, or by both?
+\item[RQ4 (Agent effectiveness)] How does the accuracy of an LLM-based agent in choosing the dataset change under the same conditions?
+\item[RQ5 (Cost)] How much context does the agent consume under each condition?
+\end{description}
+
+\section{Context and Case Selection}
+The case is TIAGO Dados Abertos, an open-source MCP server maintained by the Brazilian
+power system operator (ONS). At version 1.1.0 it describes 80 open datasets with 80 data
+contracts written in the Open Data Contract Standard, with 887 columns and 351 governed
+metrics. It exposes four tools (\texttt{buscar\_dataset}, \texttt{listar\_datasets},
+\texttt{descrever\_dataset}, \texttt{executar\_sql}); dataset routing combines BM25 with
+keyword rules over the contracts.
+
+The case was selected for three reasons. The contracts are unusually rich: besides schema,
+each one carries a \texttt{semantics} block with row grain, metric definitions and
+aggregation rules. The domain has quantities that cannot be aggregated in the same way
+(average power in MWmed, stored energy in MWmes), so a wrong answer can be silently
+plausible. And the author works at the organisation and had access to question sets written
+by its staff.
+
+The author is a development intern at ONS and joined the organisation after the DatathONS
+data competition, to help build TIAGO PDA, the open-data portal of the operator, and the MCP
+server studied here \cite{baguete2026ons}. The press presented the server as the first MCP
+server of the Brazilian power sector \cite{baguete2026ons}. It is, as far as this study
+found, the first published by an institution of the sector, but not the first to expose
+sector data: a community server covering more than 70 Brazilian public APIs added tools for
+the open-data portal of the regulator, ANEEL, in April 2026 \cite{mcpbrasil2026}. The study was therefore carried out by a member of the team that
+develops the system, on the system itself. This gives access to the code, to the contracts
+and to the people who wrote the questions, and it is also a source of bias that is discussed
+with the threats to validity.
+
+Figure~\ref{fig:architecture} shows the architecture of the server and the part changed by
+the study. An agent calls the tools of the server through MCP. The search and describe tools
+answer from a catalogue, which in production is built from the data contracts; the SQL tool
+runs queries with DuckDB over Parquet files published by ONS on S3. The study replaces only
+the catalogue: the router, the tools and the data stay as they are.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, align=center, font=\footnotesize,
+              minimum height=0.9cm, text width=3.1cm},
+  var/.style={box, dashed, text width=2.5cm},
+  arr/.style={-{Stealth[length=2mm]}, semithick},
+  node distance=0.8cm and 0.9cm]
+\node[box] (agent) {LLM-based agent\\(Amazon Bedrock)};
+\node[box, below=of agent] (mcp) {MCP server\\search, describe, SQL tools};
+\node[box, below left=of mcp] (router) {Router\\BM25 and keyword rules};
+\node[box, below right=of mcp] (duck) {DuckDB};
+\node[box, below=of duck] (s3) {Parquet files on S3\\(ONS open data)};
+\node[var, below=of router, xshift=-2.9cm] (schema) {Schema only};
+\node[var, below=of router] (contracts) {ODCS data contracts};
+\node[var, below=of contracts] (onto) {Ontology\\(T-Box and A-Box)};
+\draw[arr] (agent) -- node[right, font=\scriptsize] {MCP} (mcp);
+\draw[arr] (mcp) -| (router);
+\draw[arr] (mcp) -| (duck);
+\draw[arr] (duck) -- (s3);
+\draw[arr] (router) -- (contracts);
+\draw[arr] (router) -| (schema);
+\draw[arr] (contracts) -- node[right, font=\scriptsize] {generator, ledger} (onto);
+\end{tikzpicture}
+\caption{Architecture of the server. Dashed boxes are the catalogues compared in the study;
+the ontology is generated from the contracts.}
+\label{fig:architecture}
+\end{figure}
+
+\section{Data Collection}
+\textbf{Contracts and ontology.} The ontology was built twice. A first, exploratory attempt
+with an AI coding assistant produced a small ontology whose aliases the assistant adjusted
+case by case. It is kept as a tagged snapshot and is not used in the results. The second
+attempt, reported here, separates a hand-written schema (T-Box, 168 lines of Turtle) from
+generated content (A-Box). In this text, \emph{hand-written} means written directly rather
+than produced by a program; in both attempts that writing was done with AI coding assistants
+under the author's direction.
+The schema reuses DCAT and Dublin Core for dataset metadata, RDF Data Cube for measures and
+dimensions, CSVW for columns, SKOS for controlled vocabularies and QUDT for quantity kinds
+and units. A generator reads the 80 contracts and emits 39{,}390 triples; no instance data
+is written by hand. Every construct occurrence found in a contract is recorded in a ledger
+with its level of representation.
+
+\textbf{Question sets.} Two sets written by ONS staff for an earlier question-answering
+system were used: a curated test battery with 133 questions, of which 106 are usable for
+routing (27 follow-up questions that depend on a previous turn and rows with no expected
+dataset were excluded), and a selector benchmark with 204 questions that have exactly one
+correct dataset. Neither set repeats a question indexed by the server. The battery was
+curated by a member of the quality team in June 2026 to cover 77 datasets with a mix of
+difficulty, subsystems, sources and writing styles; the selector benchmark was assembled by
+another member of the development team in the same month to measure dataset selection. The
+two sets are not independent: 65 of the 204 questions share at least 60\% of their words
+with a battery question, 24 of them all of their words, and in 4 of these 65 pairs the two
+sets expect different datasets. \todo{Record the authorisation from ONS.}
+
+\textbf{Process records.} For the first attempt, the conversation log of the assistant and
+the file snapshots it kept; for the second, the version history of the study repository.
+
+\section{Analysis}
+For RQ2, construct occurrences are classified as \emph{semantic} (a typed node or controlled
+concept linked in the graph), \emph{literal} (content preserved as opaque text, SQL or JSON),
+\emph{dropped}, or not applicable when the contract explicitly declares no value. The share
+carried by standard vocabularies is also reported.
+
+For RQ3, the production router is never modified; only the catalogue it receives changes.
+Five catalogues are compared: schema only, the contracts, the contracts with an ontology
+re-rank, and two catalogues rebuilt from the ontology graph, one with semantic content only
+and one with semantic and literal content. The re-rank moves members of a measure family at
+the grain named in the question ahead of their siblings and has no tunable weight. Top-1,
+top-3 and MRR are reported with 95\% Wilson intervals.
+
+For RQ4 and RQ5, a Claude Sonnet 5.5 model on Amazon Bedrock (and, in a second step, Claude Haiku 5.5 and Claude Opus 5.5) receives a search tool, a
+describe tool and a final-answer tool, all backed by the catalogue of the condition. The
+answer is correct when the chosen dataset is one of the valid ones. Input tokens per
+question measure the context cost. Sampling parameters cannot be set on this model, so the
+round is not deterministic. Each condition was run once; two conditions were repeated on the
+battery to measure the variation between runs.
+
+Every question is answered under every condition, so two conditions are compared on the
+same questions. A difference is accepted only when it is larger than chance would produce,
+and the threshold is tightened because several comparisons are made at once. Formally,
+paired differences in accuracy use the exact McNemar test, which looks only at the
+questions on which the two conditions disagree, with the Holm correction for multiple
+comparisons; differences in accuracy and in tokens also get 95\% intervals from 10{,}000
+paired bootstrap resamples, that is, from re-drawing the set of questions at random and
+recomputing the difference each time.
+
+\section{Results}
+
+\subsection{RQ1: Effort}
+Table~\ref{tab:effort} summarises the two attempts. In the first, the assistant log holds
+19 user prompts, 204 tool calls and 46 minutes of assistant time over four working days,
+with 73 intermediate versions of 26 files. Its outcome covered three contract constructs,
+and the assistant adjusted the phenomenon aliases case by case until coverage rose from 22
+to 74 of 77 datasets, with the author approving each step rather than writing the aliases.
+In the second, the mapping is a program: a generator of about 400 lines of Python and 168
+lines of hand-written schema; the whole study code has about 1{,}600 lines.
+The second attempt was also carried out with an AI coding assistant, a different one, in a
+single working day. The log of that session holds 31 user prompts and 244 tool calls. These
+figures cover more than the migration: the same session reviewed the first attempt, ran the
+experiments and drafted this text. The time the author spent reading and deciding was not
+recorded in either attempt, so the figures describe the interaction with the assistants and
+not person-hours.
+
+Six design decisions separate the second attempt from the first: (i) instance data is
+generated from the contracts and never written by hand; (ii) standard vocabularies are
+reused before any term is coined; (iii) content that cannot be typed is kept as a literal,
+and every such case is recorded in the ledger; (iv) alignments to the IEC CIM are loose
+matches only; (v) the production router is not modified; and (vi) only questions written
+by people are used for evaluation.
+
+\begin{table}[ht]
+\centering\small
+\caption{Effort of the two attempts at deriving the ontology.}
+\label{tab:effort}
+\begin{tabular}{lrr}
+\toprule
+ & First attempt & Second attempt \\
+\midrule
+Contract construct types represented & 3 of 65 & 59 of 65 \\
+Hand-written instance data & partly & none \\
+Instance data & 77 dataset bindings & 39{,}390 triples \\
+Schema, hand-written lines & 254 & 168 \\
+Working days with activity & 4 & 1 \\
+User prompts to the assistant & 19 & 31 \\
+Tool calls by the assistant & 204 & 244 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{RQ2: Fidelity}
+Table~\ref{tab:fidelity} shows what happened to the 26{,}839 construct occurrences found in
+the 80 contracts; 484 further occurrences are explicit ``no value'' markers. More than half
+of the content became typed knowledge and 40\% was preserved as literals. What was dropped
+belongs to the physical layer and to contract housekeeping.
+
+\begin{table}[ht]
+\centering\small
+\caption{Construct occurrences of the data contracts by level of representation in the ontology.}
+\label{tab:fidelity}
+\begin{tabular}{lrrr}
+\toprule
+Contract block & Semantic & Literal & Dropped \\
+\midrule
+Catalogue and identity & 2{,}063 & 240 & 0 \\
+Grain, dimensions and classification & 1{,}304 & 164 & 4 \\
+Metrics & 4{,}045 & 2{,}357 & 0 \\
+Columns & 5{,}758 & 5{,}513 & 0 \\
+Value aliases & 1{,}606 & 0 & 16 \\
+Agent support (questions and SQL) & 413 & 1{,}217 & 0 \\
+Physical layer and operations & 0 & 1{,}297 & 842 \\
+\midrule
+Total & 15{,}189 (56.6\%) & 10{,}788 (40.2\%) & 862 (3.2\%) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Of the 25{,}977 represented occurrences, 13{,}480 (51.9\%) are carried by a standard
+vocabulary. Units show the limit of reuse: only 14 of the 45 units found in the contracts
+have a QUDT equivalent, and the units specific to the Brazilian sector (MWmed, MWmes,
+R\$/MWh) do not. The migration also surfaced inconsistencies that the contracts tolerate:
+the same domain written with and without accents, two spellings of the same unit, and two
+names for the same aggregation.
+
+\subsection{RQ3: Routing effectiveness}
+\begin{table}[ht]
+\centering\small
+\caption{Top-1 accuracy of the server's router (95\% Wilson interval).}
+\label{tab:routing}
+\begin{tabular}{lcc}
+\toprule
+Catalogue given to the router & Battery ($n=106$) & Selector set ($n=204$) \\
+\midrule
+Schema only & 0.330 [0.25, 0.42] & 0.382 [0.32, 0.45] \\
+Contracts (production) & 0.679 [0.59, 0.76] & 0.750 [0.69, 0.80] \\
+Contracts + ontology re-rank & 0.689 [0.60, 0.77] & 0.745 [0.68, 0.80] \\
+Ontology, semantic content only & 0.632 [0.54, 0.72] & 0.667 [0.60, 0.73] \\
+Ontology, semantic and literal content & 0.679 [0.59, 0.76] & 0.750 [0.69, 0.80] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The catalogue rebuilt from the full ontology reproduces the contracts: no question is routed
+differently in either set. With semantic content only, accuracy drops by 5 to 8 points; the
+difference is significant on the larger set (Holm-adjusted $p=0.035$) and not on the battery
+($p=0.44$). The re-rank changes one answer in each set, in opposite directions. On the
+questions rated hard in the battery, accuracy is at most 0.40 under every condition.
+
+\subsection{RQ4: Agent effectiveness}
+\begin{table}[ht]
+\centering\small
+\caption{Accuracy of the LLM-based agent in choosing the dataset (95\% Wilson interval) and
+mean input tokens per question.}
+\label{tab:agent}
+\begin{tabular}{lcrcr}
+\toprule
+ & \multicolumn{2}{c}{Battery ($n=106$)} & \multicolumn{2}{c}{Selector set ($n=204$)} \\
+Catalogue behind the tools & Accuracy & Tokens & Accuracy & Tokens \\
+\midrule
+Schema only & 0.660 [0.57, 0.74] & 3{,}999 & 0.838 [0.78, 0.88] & 3{,}624 \\
+Contracts & 0.858 [0.78, 0.91] & 6{,}777 & 0.912 [0.87, 0.94] & 6{,}117 \\
+Ontology, semantic only & 0.868 [0.79, 0.92] & 4{,}460 & 0.917 [0.87, 0.95] & 4{,}100 \\
+Ontology, semantic and literal & 0.877 [0.80, 0.93] & 5{,}016 & 0.912 [0.87, 0.94] & 4{,}848 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The agent is far more accurate than the router alone, and the semantic layers still matter:
+contracts add 20 points over schema on the battery and 7 on the selector set (Holm-adjusted
+$p<0.01$ in both). Between contracts and either ontology catalogue there is no detectable
+difference in accuracy: at most seven discordant questions in any comparison, and no adjusted $p$ below 1. With
+schema only, the agent gives no answer for 12\% of the battery questions; with any semantic
+layer, for at most 2\%.
+
+Repeating the contracts and the semantic-only conditions on the battery gave accuracies of
+0.868 and 0.868, against 0.858 and 0.868 in the first run. The agent chose the same dataset
+in 103 and 99 of the 106 questions, and correctness changed in three and four questions.
+Run-to-run variation is therefore of the same size as the difference between the two
+conditions.
+
+The round was then repeated with two other models of the same family, Claude Haiku 5.5 and
+Claude Opus 5.5, with the same prompt and tools (Table~\ref{tab:models}). The pattern holds:
+in none of the six combinations of model and question set do the contracts and an ontology
+catalogue differ significantly (at most eleven discordant questions, no adjusted $p$ below
+0.75). Contracts beat schema only in five of the six; with Opus on the selector set the
+gain is 3.9 points and not significant (adjusted $p=0.23$), because that model already
+reaches 0.853 with the schema alone. The differences between models are smaller than the
+difference between having and not having a semantic layer.
+
+\begin{table}[ht]
+\centering\small
+\caption{Agent accuracy with three models. B: battery ($n=106$); S: selector set ($n=204$).}
+\label{tab:models}
+\begin{tabular}{llcccc}
+\toprule
+Model & Set & Schema & Contracts & Ontology, semantic & Ontology, full \\
+\midrule
+Haiku 5.5 & B & 0.613 & 0.830 & 0.830 & 0.858 \\
+ & S & 0.770 & 0.868 & 0.873 & 0.863 \\
+Sonnet 5.5 & B & 0.660 & 0.858 & 0.868 & 0.877 \\
+ & S & 0.838 & 0.912 & 0.917 & 0.912 \\
+Opus 5.5 & B & 0.717 & 0.868 & 0.849 & 0.887 \\
+ & S & 0.853 & 0.892 & 0.902 & 0.892 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{RQ5: Cost}
+The semantic-only ontology catalogue delivers the accuracy of the contracts with less
+context under every model (Table~\ref{tab:tokens}). With Sonnet the saving is about a third:
+2{,}317 fewer input tokens per question on the battery (95\% interval 1{,}145 to 3{,}587)
+and 2{,}017 fewer on the selector set (1{,}199 to 2{,}913). With Haiku and Opus, which make
+more tool calls per question and read more contract text, the saving is 56 to 58\%: about
+10{,}000 tokens per question with Haiku and 8{,}000 to 8{,}800 with Opus, with intervals
+that exclude zero in all cases. The three rounds consumed 29.9 million input tokens and 1.05
+million output tokens.
+
+\begin{table}[ht]
+\centering\small
+\caption{Mean input tokens per question. B: battery; S: selector set.}
+\label{tab:tokens}
+\begin{tabular}{llrrrr}
+\toprule
+Model & Set & Schema & Contracts & Ontology, semantic & Saving vs.\ contracts \\
+\midrule
+Haiku 5.5 & B & 5{,}443 & 17{,}821 & 7{,}566 & 58\% \\
+ & S & 5{,}283 & 17{,}332 & 7{,}341 & 58\% \\
+Sonnet 5.5 & B & 3{,}999 & 6{,}777 & 4{,}460 & 34\% \\
+ & S & 3{,}624 & 6{,}117 & 4{,}100 & 33\% \\
+Opus 5.5 & B & 6{,}010 & 15{,}488 & 6{,}702 & 57\% \\
+ & S & 5{,}372 & 14{,}138 & 6{,}153 & 56\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Discussion and Lessons Learned}
+\textbf{A generated ontology is a lossless carrier, so its value lies elsewhere.} Because
+every routing-relevant construct was migrated, the full ontology behaves exactly like the
+contracts. An ontology derived from complete contracts cannot beat them on a task the
+contracts already support; it can only match them, reorganise them, or expose what they lack.
+
+\textbf{Vocabulary matters more than structure.} The first attempt kept three structural
+axes and dropped the vocabulary, and its ontology-only condition routed worse than a plain
+schema. The second attempt carries labels and aliases as typed annotations and routes close
+to the contracts without any free text.
+
+\textbf{An agent needs less text than a lexical router.} Free text and example questions are
+worth 5 to 8 points to the BM25 router and nothing measurable to the agent, which reaches the
+same accuracy on typed content with a third to almost three fifths less context, depending on the model.
+
+\textbf{The migration works as an audit of the contracts.} Normalising values exposed
+inconsistent spellings, and typing the grain exposed contracts that declare no entity where
+one exists (the equivalent-reservoir datasets are typed at subsystem grain).
+
+\textbf{The remaining errors are confusions between siblings.} With any semantic layer the
+agent misses 11 of the 106 battery questions and 15 of the 204 selector questions under
+every condition. The wrong choices are almost always a neighbouring dataset of the same
+subject: daily load instead of monthly load, the general instead of the detailed scheduling
+balance, plant generation instead of installed capacity. Two selector questions expect a
+dataset that the catalogue marks as discontinued and therefore never offers.
+
+\textbf{Cross-dataset knowledge did not help routing.} The family-grain re-rank, the one
+mechanism that uses knowledge absent from individual contracts, was neutral.
+
+\section{Threats to Validity}
+\textbf{Construct validity.} Choosing the right dataset is a necessary step, not the final
+answer; neither the SQL nor the returned value was evaluated. The fidelity levels depend on
+mapping decisions made by the author, which are explicit in the generator. The questions
+were written for another system and their expected datasets reflect that system's catalogue.
+
+\textbf{Internal validity.} The ontology content comes from the same contracts it is
+compared with, which bounds what it can add. The agent runs on a non-deterministic model; the
+repeat of two conditions changed the outcome of three to four questions out of 106. The two
+question sets overlap; on the 139 questions of the larger set that do not resemble any
+battery question, the contracts and the semantic-only ontology reach the same accuracy under
+all three models (0.856, 0.899 and 0.878 for Haiku, Sonnet and Opus), so the overlap does
+not drive the main result. The question sets had already been used to evaluate the first attempt when the second
+ontology was designed: the generator has no parameter fitted to them, but the design was
+not blind to those results.
+
+\textbf{External validity.} One organisation, one catalogue of 80 datasets, questions in
+Portuguese, one router and three models of a single family. The contracts are richer than usual, which favours the
+contracts condition and may not hold elsewhere.
+
+\textbf{Reliability.} Code, ontology, ledger and aggregate results are public in the study
+repository, pinned to a corpus commit. The question sets and the assistant log are not
+public; the scripts that convert them are. The names of the IEC CIM classes used in the
+alignments were checked against the CIM17 schema documentation; the namespace IRI was not. Much of the code was produced with AI assistants under the author's
+direction. The author is a member of the team that develops the server, which may bias the
+design of the ontology and the reading of the results; the evaluation therefore relies on
+questions written by other people and on automatic scoring.
+
+\section{Concluding Remarks}
+In this case, migrating rich data contracts to an ontology preserved what the contracts
+knew, at the cost of one generator and a small hand-written schema, and did not make the
+agent more accurate. What changed was the cost: the agent reached the same accuracy with
+less context. The next chapter discusses what follows from this and what the study leaves
+open.

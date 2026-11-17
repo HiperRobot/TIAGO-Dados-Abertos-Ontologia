@@ -1,0 +1,177 @@
+% Projeto Final II (INF1951) -- PUC-Rio, Departamento de Informatica
+% Layout follows the "Manual do Aluno, Projeto Final II" (Baffa & Mathias Filho, 2023):
+% A4, Arial 11 (Helvetica clone here), 1.5 line spacing, 1 cm paragraph indent,
+% margins 2.5 cm top/bottom and 3.5 cm left/right, no blank line between paragraphs,
+% page number at the top right starting at the Introduction, ABNT references.
+\documentclass[11pt,a4paper,oneside]{report}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil,english]{babel}
+\usepackage[scaled]{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[top=2.5cm,bottom=2.5cm,left=3.5cm,right=3.5cm,headheight=1cm,footskip=0cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{1cm}
+\setlength{\parskip}{0pt}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[alf]{abntex2cite} % ABNT NBR 6023, author-year
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[R]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+\newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+
+% ---- work data (edit here) -------------------------------------------------
+\newcommand{\thesistitle}{A Case Study on Migrating Data Contracts to Ontologies for Agent Consumption}
+\newcommand{\thesisauthor}{Thiago Henriques Pinto}
+\newcommand{\thesisadvisor}{Marcos Kalinowski}
+\newcommand{\thesisdate}{dezembro de 2026}
+
+\begin{document}
+\pagenumbering{gobble}
+
+% ---- Capa ------------------------------------------------------------------
+\begin{titlepage}
+\begin{flushright}
+{\scshape Pontif\'icia Universidade Cat\'olica do Rio de Janeiro}\par
+\vspace{5cm}
+{\LARGE\bfseries \thesistitle\par}
+\vspace{3cm}
+{\Large\bfseries \thesisauthor\par}
+\vspace{3cm}
+{\scshape Projeto Final de Gradua\c{c}\~ao}\par
+\vspace{3cm}
+{\scshape Centro T\'ecnico Cient\'ifico -- CTC}\par
+{\scshape Departamento de Inform\'atica}\par
+Curso de Gradua\c{c}\~ao em Ci\^encia da Computa\c{c}\~ao\par
+\vfill
+Rio de Janeiro, \thesisdate
+\end{flushright}
+\end{titlepage}
+
+% ---- Folha de rosto --------------------------------------------------------
+\begin{flushright}
+\vspace*{2cm}
+% \includegraphics[width=2.2cm]{figures/puc-logo} % add the PUC-Rio logo file
+\vspace{3cm}
+{\large\bfseries \thesisauthor\par}
+\vspace{4cm}
+{\Large\bfseries \thesistitle\par}
+\vspace{3cm}
+\begin{minipage}{0.62\textwidth}
+\begin{singlespace}
+Relat\'orio de Projeto Final, apresentado ao programa de Gradua\c{c}\~ao do
+Departamento de Inform\'atica da PUC-Rio como requisito parcial para a
+obten\c{c}\~ao do t\'itulo de Bacharel em Ci\^encia da Computa\c{c}\~ao.
+\end{singlespace}
+\end{minipage}\par
+\vspace{2cm}
+Orientador: \thesisadvisor\par
+\vfill
+Rio de Janeiro\par \thesisdate
+\end{flushright}
+\clearpage
+
+% ---- Agradecimentos ---------------------------------------------------------
+\selectlanguage{brazil}
+\section*{Agradecimentos}
+\`A minha fam\'ilia, pelo apoio em todos os momentos do curso.
+
+Aos meus amigos e aos colegas do Departamento de Inform\'atica, pela companhia e pela ajuda
+ao longo da gradua\c{c}\~ao.
+
+Ao meu orientador, professor Marcos Kalinowski, pela orienta\c{c}\~ao deste trabalho.
+\clearpage
+
+% ---- Resumo / Abstract (max. 250 words each, up to five keywords) -----------
+\selectlanguage{brazil}
+\section*{Resumo}
+\begin{singlespace}
+\noindent Pinto, Thiago Henriques. Kalinowski, Marcos. \thesistitle. Rio de Janeiro, 2026.
+\todo{n} p. Relat\'orio de Projeto Final II -- Departamento de Inform\'atica.
+Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
+
+\vspace{1em}
+\noindent Agentes baseados em modelos de linguagem consultam dados por meio de ferramentas, e
+o que sabem sobre cada conjunto de dados \'e o que a camada de descri\c{c}\~ao lhes informa.
+Este trabalho apresenta um estudo de caso da migra\c{c}\~ao de contratos de dados para uma
+ontologia no TIAGO Dados Abertos, servidor de c\'odigo aberto que exp\~oe os dados abertos do
+Operador Nacional do Sistema El\'etrico (ONS) pelo Model Context Protocol. A migra\c{c}\~ao
+\'e caracterizada quanto a esfor\c{c}o, fidelidade do mapeamento, efic\'acia do roteamento,
+efic\'acia do agente e custo de contexto. Uma ontologia que reutiliza vocabul\'arios padr\~ao
+foi gerada a partir dos 80 contratos, com 39.390 triplas e nenhuma inst\^ancia escrita \`a
+m\~ao. Dos construtos dos contratos, 56,6\% tornaram-se conhecimento tipado, 40,2\% foram
+preservados como texto e 3,2\% foram descartados. Em dois conjuntos de perguntas escritas
+por pessoas do ONS (106 e 204 perguntas), o roteador do servidor teve com a ontologia
+completa o mesmo desempenho que com os contratos, e desempenho inferior quando o texto livre
+foi removido. Um agente com o modelo Claude Sonnet 5.5 escolheu o conjunto de dados correto
+com acur\'acia equivalente usando contratos (0,858 e 0,912) ou a ontologia apenas com
+conte\'udo tipado (0,868 e 0,917), consumindo com esta cerca de um ter\c{c}o a menos de
+tokens de entrada; com os modelos Haiku 5.5 e Opus 5.5 o resultado se repetiu, com economia
+de 56 a 58\%. Conclui-se que, neste caso, a ontologia derivada de contratos ricos
+preserva o que eles sabem e reduz o custo de contexto, sem aumentar a acur\'acia.
+
+\vspace{1em}
+\noindent\textbf{Palavras-chave}\par
+\noindent contratos de dados; ontologias; agentes baseados em LLM; Model Context Protocol; estudo de caso.
+\end{singlespace}
+
+\selectlanguage{english}
+\section*{Abstract}
+\begin{singlespace}
+\noindent Pinto, Thiago Henriques. Kalinowski, Marcos. \thesistitle. Rio de Janeiro, 2026.
+\todo{n} pages. Undergraduate Thesis II -- Departamento de Inform\'atica.
+Pontif\'icia Universidade Cat\'olica do Rio de Janeiro.
+
+\vspace{1em}
+\noindent Agents based on language models query data through tools, and what they know about
+each dataset is what the description layer tells them. This work presents a case study of
+the migration of data contracts to an ontology in TIAGO Dados Abertos, an open-source server
+that exposes the open data of the Brazilian power system operator (ONS) through the Model
+Context Protocol. The migration is characterised with respect to effort, mapping fidelity,
+routing effectiveness, agent effectiveness and context cost. An ontology that reuses
+standard vocabularies was generated from the 80 contracts, with 39,390 triples and no
+hand-written instance. Of the contract constructs, 56.6\% became typed knowledge, 40.2\%
+were preserved as text and 3.2\% were dropped. On two sets of questions written by ONS staff
+(106 and 204 questions), the router of the server performed with the full ontology as it
+did with the contracts, and worse when free text was removed. An agent running Claude
+Sonnet 5.5 chose the correct dataset with equivalent accuracy using the contracts (0.858
+and 0.912) or the ontology with typed content only (0.868 and 0.917), and with the latter
+consumed about one third fewer input tokens; with Haiku 5.5 and Opus 5.5 the result held,
+with savings of 56 to 58\%. In this case, an ontology derived from rich
+contracts preserves what they know and reduces context cost, without increasing accuracy.
+
+\vspace{1em}
+\noindent\textbf{Keywords}\par
+\noindent data contracts; ontologies; LLM-based agents; Model Context Protocol; case study.
+\end{singlespace}
+\clearpage
+
+\tableofcontents
+\listoffigures
+\listoftables
+\clearpage
+
+\pagenumbering{arabic}
+\input{chapters/1-introduction}
+\input{chapters/2-background}
+\input{chapters/3-related-work}
+\input{chapters/4-case-study}
+\input{chapters/5-conclusion}
+
+\bibliography{references}
+\end{document}

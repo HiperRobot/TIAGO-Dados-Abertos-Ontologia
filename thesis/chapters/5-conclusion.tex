@@ -1,0 +1,67 @@
+\chapter{Conclusion}
+
+\section{Contributions}
+This work characterised the migration of the data contracts of a real MCP server to an
+ontology. It delivered an ontology whose content is generated from the 80 contracts, a
+ledger that states how each contract construct was represented, an evaluation with a
+deterministic router and with an LLM-based agent on questions written by people, and a
+prototype server that answers from the ontology.
+
+The main findings are three. More than half of the contract content becomes typed knowledge
+and 40\% survives as literals; what is left behind is physical and operational. For the
+lexical router of the server the ontology is at best equivalent to the contracts, and loses
+5 to 8 points of top-1 accuracy when free text is removed. For an LLM-based agent the
+ontology with typed content only is as accurate as the contracts and uses between a third
+and almost three fifths less context, under three models of different sizes.
+
+\section{Limitations}
+The study covers one organisation, one catalogue and one language. Effectiveness was
+measured as the choice of the dataset, not as the correctness of the final answer. The agent
+round used three models of one family, and each condition was run once on non-deterministic
+models; a repeat of two conditions changed the outcome of three to four questions out of 106. The ontology content derives from
+the contracts, so the study says little about ontologies built from independent domain
+knowledge. The question sets are not public.
+
+\section{Future Work}
+\begin{itemize}[leftmargin=1.5cm]
+\item Evaluate the final answer: execute the generated SQL and compare values, including
+executable but wrong answers caused by units and aggregation.
+\item Add knowledge that the contracts do not hold, such as the relations between plants,
+reservoirs and basins, and measure questions that need it.
+\item Obtain a second annotation of the question sets and report inter-rater agreement.
+\item Replace the lexical router with a retriever that uses the ontology graph.
+\item Replicate the migration on the catalogue of another organisation.
+\end{itemize}
+
+\section{Lessons Learned}
+The two attempts at the migration taught more than the final numbers.
+
+\textbf{Generate, do not curate.} In the first attempt the assistant tuned aliases case by
+case until the
+coverage of the datasets looked good, which fitted the ontology to the test. Deriving every
+instance from the contracts with a program made the mapping repeatable, auditable through
+the ledger, and free of parameters fitted to the questions.
+
+\textbf{Evaluate on questions written by people, and check them.} The first test set was
+made of automatic paraphrases of the development questions and overstated the results.
+The sets written by ONS staff changed the conclusions; they also overlap and disagree on
+four questions, which only a comparison between them revealed.
+
+\textbf{Correct for multiple comparisons and repeat the runs.} A difference that looked
+significant in the first attempt disappeared after the Holm correction, and repeating the
+agent round showed that the variation between runs is as large as the difference between
+contracts and ontology.
+
+\textbf{Measure cost together with accuracy.} The main finding of this study, the smaller
+context of the ontology catalogue, would have been missed if only accuracy had been
+measured.
+
+\textbf{Verify what assistants and sources claim.} Several statements produced during the
+work, by AI assistants and by the press, did not hold when checked against the code, the
+data or primary sources. Version control from the first day, which the first attempt
+lacked, is what made these checks possible.
+
+If the work were started again, a domain expert would review the schema of the ontology
+and the mapping decisions before the experiments, a condition with the contracts stripped
+of free text would separate the effect of the ontology from that of a shorter description,
+and the agent would be evaluated against the real server and on the final answer.
